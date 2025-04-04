@@ -1,0 +1,38 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: main
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🧾 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐳 Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: 📦 Create `.env` file
+        run: |
+          cat <<EOF > .env
+          SECRET_KEY=${{ secrets.SECRET_KEY }}
+          IS_DEVELOPMENT=${{ secrets.IS_DEVELOPMENT }}
+          ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}
+          ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          EOF
+
+      - name: 🔧 Build Docker stack and Run tests
+        run: |
+          docker compose -f docker-compose.yml \
+          -f docker-compose.tests.yml up --build \
+          --abort-on-container-exit --exit-code-from tests
+
+      - name: 🧹 Shut down Docker stack
+        if: always()
+        run: docker compose -f docker-compose.yml -f docker-compose.tests.yml down -v

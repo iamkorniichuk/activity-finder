@@ -3,7 +3,7 @@
 .ruff_cache/
 .pytest_cache/
 .git/
-tests/
+.github/
 
 **/*.pyc
 **/*.pyo
