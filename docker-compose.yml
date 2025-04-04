@@ -1,0 +1,47 @@
+services:
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    env_file: .env
+    volumes:
+      - web-static:/var/www/static
+      - web-media:/var/www/media
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    volumes:
+      - db-data:/var/lib/data
+    environment:
+      - POSTGRES_USER=db-user
+      - POSTGRES_DB=activity-finder
+    env_file: .env
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "activity-finder", "-U", "db-user"]
+      interval: 10s
+      timeout: 15s
+      retries: 5
+
+  proxy:
+    build:
+      context: ./proxy
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+    volumes:
+      - web-static:/var/www/static:ro
+      - web-media:/var/www/media
+      - proxy-log:/var/log/proxy
+    depends_on:
+      - web
+
+volumes:
+  web-static:
+  web-media:
+  db-data:
+  proxy-log:
