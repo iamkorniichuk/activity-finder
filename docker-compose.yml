@@ -27,6 +27,7 @@ services:
       timeout: 15s
       retries: 5
 
+
   proxy:
     build:
       context: ./proxy
@@ -39,6 +40,19 @@ services:
       - proxy-log:/var/log/proxy
     depends_on:
       - web
+    healthcheck:
+      test: ["CMD", "service", "nginx", "status"]
+      interval: 10s
+      timeout: 15s
+      retries: 5
+
+  tests:
+    build:
+      context: ./tests
+      dockerfile: Dockerfile
+    depends_on:
+      proxy:
+        condition: service_healthy
 
 volumes:
   web-static:

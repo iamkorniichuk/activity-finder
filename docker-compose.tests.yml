@@ -1,0 +1,9 @@
+services:
+
+  tests:
+    build:
+      context: ./tests
+      dockerfile: Dockerfile
+    depends_on:
+      proxy:
+        condition: service_healthy
