@@ -1,5 +1,7 @@
 from pathlib import Path
 from environs import Env
+from datetime import timedelta
+
 
 env = Env()
 env.read_env()
@@ -21,6 +23,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "corsheaders",
+    "rest_framework",
+    "rest_framework_simplejwt.token_blacklist",
+    "authentication",
     "users",
 ]
 
@@ -96,3 +101,26 @@ MEDIA_URL = "media/"
 MEDIA_ROOT = "/var/www/media/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+}
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+AUTH_USER_MODEL = "users.User"
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "TOKEN_OBTAIN_SERIALIZER": "authentication.serializers.UserTokenObtainPairSerializer",
+}
