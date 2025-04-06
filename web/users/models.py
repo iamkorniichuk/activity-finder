@@ -15,7 +15,16 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser):
-    username = models.CharField(max_length=32, db_index=True, unique=True)
+    username = models.SlugField(max_length=16, db_index=True, unique=True)
+    image = models.ImageField(
+        upload_to="users/",
+        default="users/default-image.png",
+        blank=True,
+    )
+    display_name = models.CharField(max_length=48, null=True, blank=True)
+    description = models.CharField(max_length=256, null=True, blank=True)
+    birth_date = models.DateField(blank=True, null=True)
+    last_login = None
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = []
