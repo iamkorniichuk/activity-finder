@@ -1,12 +1,12 @@
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, GenericAPIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.token_blacklist.models import (
     OutstandingToken,
     BlacklistedToken,
 )
+from drf_spectacular.utils import extend_schema
 
 from .serializers import SignUpSerializer, User
 
@@ -17,7 +17,8 @@ class SignUpView(CreateAPIView):
     permission_classes = (AllowAny,)
 
 
-class LogoutAllView(APIView):
+class LogoutAllView(GenericAPIView):
+    @extend_schema(request=None, responses={200: None})
     def post(self, request):
         current_user = request.user
 

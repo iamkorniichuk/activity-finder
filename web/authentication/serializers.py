@@ -4,10 +4,25 @@ from django.contrib.auth.password_validation import (
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from drf_spectacular.utils import (
+    extend_schema_field,
+    extend_schema_serializer,
+    OpenApiExample,
+)
+from drf_spectacular.openapi import OpenApiTypes
 
 from users.models import User
 
 
+@extend_schema_serializer(
+    examples=[
+        OpenApiExample(
+            "Response",
+            value={"pk": 0, "username": "^-$", "refresh": "string", "access": "string"},
+            response_only=True,
+        ),
+    ]
+)
 class UserTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, data):
         data = super().validate(data)
@@ -28,10 +43,12 @@ class SignUpSerializer(serializers.ModelSerializer):
     refresh = serializers.SerializerMethodField()
     access = serializers.SerializerMethodField()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_refresh(self, obj):
         token = RefreshToken.for_user(obj)
         return str(token)
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_access(self, obj):
         token = RefreshToken.for_user(obj).access_token
         return str(token)

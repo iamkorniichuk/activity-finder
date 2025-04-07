@@ -1,4 +1,4 @@
-class TestLoginRefresh:
+class TestLoginRefreshAuth:
     url = "/auth/login-refresh/"
 
     def test_successful(self, client, user_tokens):

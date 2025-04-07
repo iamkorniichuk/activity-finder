@@ -1,4 +1,4 @@
-class TestLogout:
+class TestLogoutAuth:
     url = "/auth/logout/"
 
     def test_missing_token(self, client):

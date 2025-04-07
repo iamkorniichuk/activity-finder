@@ -2,7 +2,7 @@ import pytest
 from uuid import uuid4
 
 
-class TestSignUp:
+class TestSignUpAuth:
     url = "/auth/signup/"
 
     def test_successful(self, client, user_data):
@@ -44,8 +44,8 @@ class TestSignUp:
         data = response.json()
         assert "password" in data
 
-    def test_duplicate_user(self, client, user):
-        response = client.post(self.url, json=user)
+    def test_duplicate_user(self, client, signup_user, user_data):
+        response = client.post(self.url, json=user_data)
         assert response.status_code == 400
         data = response.json()
         assert "username" in data

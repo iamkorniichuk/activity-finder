@@ -1,11 +1,11 @@
 import pytest
 
 
-class TestLogin:
+class TestLoginAuth:
     url = "/auth/login/"
 
-    def test_successful(self, client, user):
-        response = client.post(self.url, json=user)
+    def test_successful(self, client, signup_user, user_data):
+        response = client.post(self.url, json=user_data)
         assert response.status_code == 200
         data = response.json()
         assert "access" in data and "refresh" in data
@@ -18,9 +18,9 @@ class TestLogin:
             "strongp@ssw0rd!",
         ],
     )
-    def test_wrong_password(self, client, user, password):
-        user["password"] = password
-        response = client.post(self.url, json=user)
+    def test_wrong_password(self, client, signup_user, user_data, password):
+        user_data["password"] = password
+        response = client.post(self.url, json=user_data)
         assert response.status_code == 401
 
     def test_nonexistent_user(self, client, user_data):
