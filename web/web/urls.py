@@ -18,5 +18,6 @@ urlpatterns = [
         name="swagger",
     ),
     path("auth/", include("authentication.urls"), name="authentication"),
+    path("schedules/", include("schedules.urls"), name="schedules"),
     path("users/", include("users.urls"), name="users"),
 ]
