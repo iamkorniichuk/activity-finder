@@ -19,5 +19,6 @@ urlpatterns = [
     ),
     path("auth/", include("authentication.urls"), name="authentication"),
     path("schedules/", include("schedules.urls"), name="schedules"),
+    path("territories/", include("territories.urls"), name="territories"),
     path("users/", include("users.urls"), name="users"),
 ]

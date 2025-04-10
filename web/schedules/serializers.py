@@ -1,41 +1,34 @@
 from rest_framework import serializers
-from drf_writable_nested.serializers import WritableNestedModelSerializer
 
-from users.serializers import UserSerializer
-from commons.serializers import TimeRangeField
+from commons.serializers import MainWritableNestedModelSerializer, TimeRangeField
 from commons import models
 
 from .models import Schedule, WorkDay
 
 
-class WorkDaySerializer(WritableNestedModelSerializer):
+class WorkDaySerializer(MainWritableNestedModelSerializer):
     class Meta:
         model = WorkDay
         fields = ("day", "work_hours", "break_hours")
+        choice_fields = ("day",)
 
     def __init__(self, *args, **kwargs):
         self.serializer_field_mapping[models.TimeRangeField] = TimeRangeField
         super().__init__(*args, **kwargs)
 
 
-class ScheduleSerializer(WritableNestedModelSerializer):
+class ScheduleSerializer(MainWritableNestedModelSerializer):
     class Meta:
         model = Schedule
         fields = (
             "pk",
             "work_days",
             "booking_duration",
-            "created_by",
-            "created_by_pk",
         )
         read_only_fields = ("pk",)
+        current_user_field = "created_by"
 
     work_days = WorkDaySerializer(many=True)
-    created_by = UserSerializer(read_only=True, required=False)
-    created_by_pk = serializers.HiddenField(
-        default=serializers.CurrentUserDefault(),
-        source="created_by",
-    )
 
     def validate_work_days(self, data):
         unique_days = set([obj["day"] for obj in data])

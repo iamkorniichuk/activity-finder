@@ -27,7 +27,9 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     "drf_spectacular",
     "authentication",
+    "commons",
     "schedules",
+    "territories",
     "users",
 ]
 
@@ -66,7 +68,7 @@ WSGI_APPLICATION = "web.wsgi.application"
 with env.prefixed("POSTGRES_"):
     DATABASES = {
         "default": {
-            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "ENGINE": "django.contrib.gis.db.backends.postgis",
             "NAME": "activity-finder",
             "USER": "db-user",
             "PASSWORD": env.str("PASSWORD"),
