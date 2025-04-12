@@ -18,6 +18,7 @@ CORS_ALLOW_CREDENTIALS = False
 
 INSTALLED_APPS = [
     "django.contrib.auth",
+    "polymorphic",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
@@ -26,6 +27,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
     "drf_spectacular",
+    "activities",
     "authentication",
     "commons",
     "schedules",
@@ -132,4 +134,5 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "Activity Finder",
     "DESCRIPTION": "Backend to finally find what to do.",
     "VERSION": "0.0",
+    "COMPONENT_SPLIT_REQUEST": True,
 }

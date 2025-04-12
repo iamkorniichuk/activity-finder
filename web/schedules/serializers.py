@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
-from commons.serializers import MainWritableNestedModelSerializer, TimeRangeField
-from commons import models
+from commons.serializers import MainWritableNestedModelSerializer
 
 from .models import Schedule, WorkDay
 
@@ -11,10 +10,6 @@ class WorkDaySerializer(MainWritableNestedModelSerializer):
         model = WorkDay
         fields = ("day", "work_hours", "break_hours")
         choice_fields = ("day",)
-
-    def __init__(self, *args, **kwargs):
-        self.serializer_field_mapping[models.TimeRangeField] = TimeRangeField
-        super().__init__(*args, **kwargs)
 
 
 class ScheduleSerializer(MainWritableNestedModelSerializer):
@@ -62,19 +57,6 @@ class ScheduleSerializer(MainWritableNestedModelSerializer):
                 work_start = break_end
 
         return data
-
-    def get_current(self, key, data, default=None):
-        if key in data:
-            return data[key]
-        if key in self.initial_data:
-            return self.initial_data[key]
-
-        if self.instance:
-            field = self.fields[key]
-            value = field.get_attribute(self.instance)
-            return field.to_internal_value(field.to_representation(value))
-
-        return default
 
 
 def time_difference(minuend, subtrahend):
