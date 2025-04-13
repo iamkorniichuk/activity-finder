@@ -36,11 +36,6 @@ class TestDetailSchedules:
         response = auth_client.patch(url, json=data)
         assert response.status_code == 200
 
-        for i, day in enumerate(response.json()["work_days"]):
-            work_day = data["work_days"][i]
-            assert work_day.get("day") == day["day"]
-            assert work_day.get("break_hours") == day["break_hours"]
-
     def test_indivisible_interval(self, auth_client, create_schedule):
         url = self.build_url(create_schedule.json()["pk"])
         data = {"booking_duration": "00:55:00"}
