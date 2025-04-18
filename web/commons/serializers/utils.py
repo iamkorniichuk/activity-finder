@@ -3,6 +3,7 @@ from drf_spectacular.utils import extend_schema_field
 from drf_spectacular.openapi import OpenApiTypes
 
 from users.serializers import UserSerializer
+from files.serializers import FileSerializer
 
 
 def _add_fields(meta, *fields):
@@ -11,6 +12,23 @@ def _add_fields(meta, *fields):
         if not isinstance(fields, fields_type):
             fields = fields_type(fields)
         meta.fields += fields
+
+
+def add_multiple_file_fields(attrs, multiple_file_fields):
+    for serializer_field_name, extra_kwargs in multiple_file_fields.items():
+        files_field_name = serializer_field_name + "_files"
+
+        attrs[serializer_field_name] = FileSerializer(
+            many=True, read_only=True, required=False
+        )
+        attrs[files_field_name] = serializers.ListField(
+            child=serializers.FileField(**extra_kwargs),
+            write_only=True,
+        )
+
+        _add_fields(attrs["Meta"], serializer_field_name, files_field_name)
+
+    return attrs
 
 
 def add_fk_serializers(attrs, fk_serializers):

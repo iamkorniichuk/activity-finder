@@ -1,1 +1,0 @@
-from .polymorphics import PolymorphicActivitySerializer as PolymorphicActivitySerializer

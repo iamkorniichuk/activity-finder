@@ -2,15 +2,15 @@ import pytest
 
 
 @pytest.fixture
-def files_data():
+def media_data():
     image1 = open("./fixtures/media/image1.png", "rb")
     image2 = open("./fixtures/media/image2.jpg", "rb")
     video1 = open("./fixtures/media/video1.mp4", "rb")
 
     yield {
-        "files[0]": image1,
-        "files[1]": image2,
-        "files[2]": video1,
+        "media[0]": image1,
+        "media[1]": image2,
+        "media[2]": video1,
     }
 
     image1.close()
@@ -32,11 +32,11 @@ def recurring_activity_data(create_schedule):
 
 
 @pytest.fixture
-def create_recurring_activity(auth_client, recurring_activity_data, files_data):
+def create_recurring_activity(auth_client, recurring_activity_data, media_data):
     yield auth_client.post(
         "/activities/",
         data=recurring_activity_data,
-        files=files_data,
+        files=media_data,
     )
 
 
@@ -54,9 +54,9 @@ def one_time_activity_data():
 
 
 @pytest.fixture
-def create_one_time_activity(auth_client, one_time_activity_data, files_data):
+def create_one_time_activity(auth_client, one_time_activity_data, media_data):
     yield auth_client.post(
         "/activities/",
         data=one_time_activity_data,
-        files=files_data,
+        files=media_data,
     )

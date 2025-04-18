@@ -11,12 +11,12 @@ class TestListActivities:
         self,
         auth_client,
         recurring_activity_data,
-        files_data,
+        media_data,
     ):
         response = auth_client.post(
             self.url,
             data=recurring_activity_data,
-            files=files_data,
+            files=media_data,
         )
         assert response.status_code == 201
         data = response.json()
@@ -27,23 +27,23 @@ class TestListActivities:
         self,
         auth_client,
         one_time_activity_data,
-        files_data,
+        media_data,
     ):
         response = auth_client.post(
             self.url,
             data=one_time_activity_data,
-            files=files_data,
+            files=media_data,
         )
         assert response.status_code == 201
         data = response.json()
         assert "time_range" in data
         assert data["type"] == "OneTimeActivity"
 
-    def test_invalid_type(self, auth_client, recurring_activity_data, files_data):
+    def test_invalid_type(self, auth_client, recurring_activity_data, media_data):
         recurring_activity_data["type"] = "OneTimeActivity"
         response = auth_client.post(
             self.url,
             data=recurring_activity_data,
-            files=files_data,
+            files=media_data,
         )
         assert response.status_code == 400

@@ -3,8 +3,7 @@ from rest_framework import viewsets, parsers
 from users.permissions import OwnedByCurrentUserOrReadOnly
 from commons.viewsets import with_my_list_endpoint
 
-from .serializers import PolymorphicActivitySerializer
-from .models import Activity
+from .serializers import PolymorphicActivitySerializer, Activity
 
 
 @with_my_list_endpoint(field_name="activities", methods=["get"])
