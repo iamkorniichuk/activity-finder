@@ -4,6 +4,7 @@ from rest_polymorphic.serializers import PolymorphicSerializer
 from commons.serializers import MainModelSerializer
 from schedules.serializers import ScheduleSerializer
 from activities.models import Activity, OneTimeActivity, RecurringActivity
+from venues.serializers import VenueSerializer
 
 
 class ActivitySerializer(MainModelSerializer):
@@ -13,20 +14,21 @@ class ActivitySerializer(MainModelSerializer):
             "pk",
             "name",
             "description",
-            "media",
-            "location",
+            "venue",
             "is_remote",
+            "media",
         )
         read_only_fields = ("pk",)
         current_user_field = "created_by"
         multiple_file_fields = {"media": {}}
+        fk_serializers = {"venue": VenueSerializer}
 
     def validate(self, data):
-        location = self.get_current("location", data)
+        venue = self.get_current("venue", data)
         is_remote = self.get_current("is_remote", data)
-        if not is_remote and not location:
+        if not is_remote and not venue:
             raise serializers.ValidationError(
-                {"location": "Required when `is_remote` is false."}
+                {"venue": "Required when `is_remote` is false."}
             )
         return super().validate(data)
 

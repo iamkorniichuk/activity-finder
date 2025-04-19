@@ -2,6 +2,7 @@ from django.contrib.gis.db import models
 from polymorphic.models import PolymorphicModel
 
 from users.models import User
+from venues.models import Venue
 from commons.models import TimeRangeField
 from schedules.models import Schedule
 from files.models import File
@@ -14,7 +15,7 @@ class Activity(PolymorphicModel):
     name = models.CharField(max_length=64)
     description = models.TextField()
     created_by = models.ForeignKey(User, models.CASCADE)
-    location = models.PointField(srid=4326, null=True, blank=True)
+    venue = models.ForeignKey(Venue, models.PROTECT, null=True, blank=True)
     is_remote = models.BooleanField()
     media = models.ManyToManyField(File)
 

@@ -1,7 +1,9 @@
 from rest_framework import serializers
+from rest_framework.utils.model_meta import get_field_info
 from django.contrib.gis.db.models import PointField as ModelPointField, Manager
 
 from commons.models import TimeRangeField as ModelTimeRangeField
+from commons.utils import resolve_nested_attribute
 from files.models import File
 
 from .utils import (
@@ -17,6 +19,10 @@ class MainModelSerializerMetaclass(serializers.SerializerMetaclass):
     def __new__(cls, name, bases, attrs):
         meta = attrs.get("Meta", None)
         if meta:
+            model = getattr(meta, "model", None)
+            if model:
+                info = get_field_info(model)
+
             current_user_field = getattr(meta, "current_user_field", None)
             if current_user_field:
                 attrs = add_current_user_serializer(attrs, current_user_field)
@@ -26,12 +32,12 @@ class MainModelSerializerMetaclass(serializers.SerializerMetaclass):
                 attrs = add_choice_display_fields(attrs, choice_fields)
 
             fk_serializers = getattr(meta, "fk_serializers", None)
-            if fk_serializers:
-                attrs = add_fk_serializers(attrs, fk_serializers)
+            if fk_serializers and model:
+                attrs = add_fk_serializers(attrs, fk_serializers, info)
 
             multiple_file_fields = getattr(meta, "multiple_file_fields", None)
-            if multiple_file_fields:
-                attrs = add_multiple_file_fields(attrs, multiple_file_fields)
+            if multiple_file_fields and model:
+                attrs = add_multiple_file_fields(attrs, multiple_file_fields, info)
 
         return super().__new__(cls, name, bases, attrs)
 
@@ -51,9 +57,12 @@ class MainModelSerializerMixin:
 
         if self.instance:
             field = self.fields[key]
-            value = field.get_attribute(self.instance)
+            value = resolve_nested_attribute(self.instance, field.source)
             if isinstance(value, Manager):
                 value = value.all()
+            if value is None:
+                return None
+
             return field.to_internal_value(field.to_representation(value))
 
     def _save_multiple_file(self, instance, files):
