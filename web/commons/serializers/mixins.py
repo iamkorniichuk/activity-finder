@@ -16,6 +16,16 @@ from .fields import TimeRangeField, PointField
 
 
 class MainModelSerializerMetaclass(serializers.SerializerMetaclass):
+    """
+    Adds new attributes to `Meta`:
+    - `current_user_field` takes a field and implicitly sets its value to current user's model
+    - `choice_display_fields` takes a list of fields and adds `<name>_display` read-only field pair to each of them
+    - `fk_serializers` takes a dict `{"<field_name>": <serializer_class>}` and creates `<name>_pk` field pair that expects pk
+
+    Attributes that need `MainModelSerializerMixin` to work:
+    - `multiple_file_fields` takes a dict `{"<field_name>": <extra_file_field_kwargs>}` and makes set fields to work for multiple file upload
+    """
+
     def __new__(cls, name, bases, attrs):
         meta = attrs.get("Meta", None)
         if meta:
@@ -43,6 +53,16 @@ class MainModelSerializerMetaclass(serializers.SerializerMetaclass):
 
 
 class MainModelSerializerMixin:
+    """
+    Overrides default serializer fields for `TimeRangeField` and `PointField`.
+
+    Adds new attributes to `Meta`:
+    - `current_user_field` takes a field and implicitly sets its value to current user's model
+    - `choice_display_fields` takes a list of fields and adds `<name>_display` read-only field pair to each of them
+    - `fk_serializers` takes a dict `{"<field_name>": <serializer_class>}` and creates `<name>_pk` field pair that expects pk
+    - `multiple_file_fields` takes a dict `{"<field_name>": <extra_file_field_kwargs>}` and makes set fields to work for multiple file upload
+    """
+
     def __init__(self, *args, **kwargs):
         self.serializer_field_mapping[ModelTimeRangeField] = TimeRangeField
         self.serializer_field_mapping[ModelPointField] = PointField
