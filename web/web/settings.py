@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "authentication",
     "commons",
     "files",
+    "reactions",
     "schedules",
     "territories",
     "users",
