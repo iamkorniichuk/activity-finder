@@ -113,7 +113,8 @@ def with_my_list_endpoint(
         original_get_queryset = base_cls.get_queryset
 
         def new_get_queryset(self):
-            if self.request.action == endpoint_name:
+            current_action = getattr(self, "action", None)
+            if current_action == endpoint_name:
                 return getattr(self, "queryset" + prefix)
             return original_get_queryset(self)
 
@@ -125,15 +126,14 @@ def with_my_list_endpoint(
             method_name = method_action_map[request.method] + prefix
             return getattr(self, method_name)(request, *self.args, **self.kwargs)
 
+        new_get_queryset.__name__ = "get_queryset"
+        setattr(base_cls, "get_queryset", new_get_queryset)
+
         endpoint.__name__ = endpoint_name
         my_action = action(detail=False, methods=methods)(endpoint)
-
         setattr(base_cls, endpoint_name, my_action)
 
-        new_get_queryset.__name__ = "get_queryset"
-        setattr(base_cls, "get_queryset" + prefix, new_get_queryset)
         set_model_viewset_actions(base_cls, action_prefix=prefix)
-
         return base_cls
 
     return decorator
