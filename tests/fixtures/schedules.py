@@ -36,4 +36,6 @@ def schedule_data():
 
 @pytest.fixture
 def create_schedule(auth_client, schedule_data):
-    yield auth_client.post("/schedules/", json=schedule_data)
+    response = auth_client.post("/schedules/", json=schedule_data)
+    assert response.status_code == 201
+    yield response

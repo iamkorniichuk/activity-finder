@@ -12,6 +12,6 @@ def client():
 
 
 @pytest.fixture
-def auth_client(client, user_tokens):
-    client.headers["Authorization"] = f"Bearer {user_tokens['access']}"
+def auth_client(client, signup_user):
+    client.headers["Authorization"] = f"Bearer {signup_user.json()['access']}"
     yield client

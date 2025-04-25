@@ -11,13 +11,10 @@ def user_data():
 
 
 @pytest.fixture
-def user_tokens(signup_user):
-    yield signup_user.json()
-
-
-@pytest.fixture
 def signup_user(client, user_data):
-    yield client.post("/auth/signup/", json=user_data)
+    response = client.post("/auth/signup/", json=user_data)
+    assert response.status_code == 201
+    yield response
 
 
 @pytest.fixture

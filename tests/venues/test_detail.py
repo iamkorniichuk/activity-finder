@@ -27,14 +27,14 @@ class TestDetailVenues:
             "username": f"user-{uuid4().hex[:8]}",
             "password": "StrongP@ssw0rd!",
         }
-        user_tokens = auth_client.post("/auth/signup/", json=user_data).json()
+        user = auth_client.post("/auth/signup/", json=user_data).json()
 
         url = self.build_url(create_venue.json()["pk"])
 
-        data = {"created_by": user_tokens["pk"]}
+        data = {"created_by": user["pk"]}
         response = auth_client.patch(url, data=data)
         assert response.status_code == 200
 
-        auth_client.headers["Authorization"] = f"Bearer {user_tokens['access']}"
+        auth_client.headers["Authorization"] = f"Bearer {user['access']}"
         response = auth_client.patch(url, data=data)
         assert response.status_code == 403

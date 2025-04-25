@@ -1,8 +1,10 @@
 class TestLoginRefreshAuth:
     url = "/auth/login-refresh/"
 
-    def test_successful(self, client, user_tokens):
-        response = client.post(self.url, json={"refresh": user_tokens["refresh"]})
+    def test_successful(self, client, signup_user):
+        response = client.post(
+            self.url, json={"refresh": signup_user.json()["refresh"]}
+        )
         assert response.status_code == 200
         data = response.json()
         assert "access" in data

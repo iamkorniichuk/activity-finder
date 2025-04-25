@@ -13,8 +13,10 @@ def venue_data():
 @pytest.fixture
 def create_venue(auth_client, venue_data, media_data, route_data):
     files = media_data | route_data
-    yield auth_client.post(
+    response = auth_client.post(
         "/venues/",
         data=venue_data,
         files=files,
     )
+    assert response.status_code == 201
+    yield response

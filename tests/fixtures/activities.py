@@ -15,11 +15,13 @@ def recurring_activity_data(create_schedule):
 
 @pytest.fixture
 def create_recurring_activity(auth_client, recurring_activity_data, media_data):
-    yield auth_client.post(
+    response = auth_client.post(
         "/activities/",
         data=recurring_activity_data,
         files=media_data,
     )
+    assert response.status_code == 201
+    yield response
 
 
 @pytest.fixture
@@ -37,8 +39,10 @@ def one_time_activity_data(create_venue):
 
 @pytest.fixture
 def create_one_time_activity(auth_client, one_time_activity_data, media_data):
-    yield auth_client.post(
+    response = auth_client.post(
         "/activities/",
         data=one_time_activity_data,
         files=media_data,
     )
+    assert response.status_code == 201
+    yield response
