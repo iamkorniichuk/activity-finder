@@ -11,8 +11,23 @@ def user_data():
 
 
 @pytest.fixture
+def user1_data():
+    yield {
+        "username": f"user1-{uuid4().hex[:8]}",
+        "password": "StrongP@ssw0rd!",
+    }
+
+
+@pytest.fixture
 def signup_user(client, user_data):
     response = client.post("/auth/signup/", json=user_data)
+    assert response.status_code == 201
+    yield response
+
+
+@pytest.fixture
+def signup_user1(client, user1_data):
+    response = client.post("/auth/signup/", json=user1_data)
     assert response.status_code == 201
     yield response
 

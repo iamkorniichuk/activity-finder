@@ -1,6 +1,3 @@
-from uuid import uuid4
-
-
 class TestDetailVenues:
     url = "/venues/"
 
@@ -22,19 +19,18 @@ class TestDetailVenues:
         data = response.json()
         assert data["name"] == "Normal club"
 
-    def test_override_created_by(self, auth_client, create_venue):
-        user_data = {
-            "username": f"user-{uuid4().hex[:8]}",
-            "password": "StrongP@ssw0rd!",
-        }
-        user = auth_client.post("/auth/signup/", json=user_data).json()
-
+    def test_override_created_by(
+        self,
+        auth_client,
+        auth_client1,
+        signup_user1,
+        create_venue,
+    ):
         url = self.build_url(create_venue.json()["pk"])
 
-        data = {"created_by": user["pk"]}
+        data = {"created_by": signup_user1.json()["pk"]}
         response = auth_client.patch(url, data=data)
         assert response.status_code == 200
 
-        auth_client.headers["Authorization"] = f"Bearer {user['access']}"
-        response = auth_client.patch(url, data=data)
+        response = auth_client1.patch(url, data=data)
         assert response.status_code == 403
