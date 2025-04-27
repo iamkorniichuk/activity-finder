@@ -2,6 +2,8 @@ from rest_framework import serializers
 from rest_polymorphic.serializers import PolymorphicSerializer
 
 from commons.serializers import MainModelSerializer
+from files.validators import media_content_type_validator
+from users.validators import OwnedByCurrentUser
 from schedules.serializers import ScheduleSerializer
 from activities.models import Activity, OneTimeActivity, RecurringActivity
 from venues.serializers import VenueSerializer
@@ -20,8 +22,8 @@ class ActivitySerializer(MainModelSerializer):
         )
         read_only_fields = ("pk",)
         current_user_field = "created_by"
-        multiple_file_fields = {"media": {}}
-        fk_serializers = {"venue": VenueSerializer}
+        multiple_file_fields = {"media": {"validators": [media_content_type_validator]}}
+        fk_serializers = {"venue": {"serializer": VenueSerializer}}
 
     def validate(self, data):
         venue = self.get_current("venue", data)
@@ -49,7 +51,12 @@ class RecurringActivitySerializer(ActivitySerializer):
             "schedule",
             "duration",
         )
-        fk_serializers = {"schedule": ScheduleSerializer}
+        fk_serializers = {
+            "schedule": {
+                "serializer": ScheduleSerializer,
+                "validators": [OwnedByCurrentUser("created_by")],
+            }
+        }
 
 
 class PolymorphicActivitySerializer(PolymorphicSerializer):

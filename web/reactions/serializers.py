@@ -14,5 +14,5 @@ class ReactionSerializer(MainModelSerializer):
         )
         read_only_fields = ("pk",)
         current_user_field = "created_by"
-        fk_serializers = {"activity": PolymorphicActivitySerializer}
+        fk_serializers = {"activity": {"serializer": PolymorphicActivitySerializer}}
         choice_fields = ("type",)

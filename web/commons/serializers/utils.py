@@ -1,3 +1,4 @@
+from copy import copy
 from rest_framework import serializers
 from rest_framework.utils.field_mapping import get_relation_kwargs
 from drf_spectacular.utils import extend_schema_field
@@ -43,7 +44,9 @@ def add_multiple_file_fields(attrs, multiple_file_fields, info):
 
 
 def add_fk_serializers(attrs, fk_serializers, info):
-    for serializer_field_name, serializer_field in fk_serializers.items():
+    for serializer_field_name, kwargs in fk_serializers.items():
+        kwargs = copy(kwargs)
+        serializer_field = kwargs.pop("serializer")
         pk_field_name = serializer_field_name + "_pk"
         source = serializer_field_name
 
@@ -53,6 +56,7 @@ def add_fk_serializers(attrs, fk_serializers, info):
             pk_field_kwargs.pop(name, None)
 
         pk_field_kwargs["source"] = source
+        pk_field_kwargs = pk_field_kwargs | kwargs
 
         pk_field = serializers.PrimaryKeyRelatedField(**pk_field_kwargs)
 
