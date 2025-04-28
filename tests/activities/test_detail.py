@@ -30,3 +30,16 @@ class TestDetailActivities:
         data = {"time_range": "15:00:00-21:00:00"}
         response = auth_client.patch(url, data=data)
         assert "time_range" not in response.json()
+
+    def test_foreign_schedule_patch(
+        self, auth_client, auth_client1, schedule_data, create_recurring_activity
+    ):
+        foreign_schedule_pk = auth_client1.post(
+            "/schedules/", json=schedule_data
+        ).json()["pk"]
+
+        url = self.build_url(create_recurring_activity.json()["pk"])
+        response = auth_client.patch(url, data={"schedule_pk": foreign_schedule_pk})
+        assert response.status_code == 400
+        data = response.json()
+        assert "schedule_pk" in data

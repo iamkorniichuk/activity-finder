@@ -47,3 +47,30 @@ class TestListActivities:
             files=media_data,
         )
         assert response.status_code == 400
+
+    def test_invalid_files(
+        self, auth_client, recurring_activity_data, invalid_media_data
+    ):
+        response = auth_client.post(
+            self.url,
+            data=recurring_activity_data,
+            files=invalid_media_data,
+        )
+        assert response.status_code == 400
+        data = response.json()
+        assert "0" in data["media_files"] and "1" in data["media_files"]
+
+    def test_foreign_schedule_post(
+        self,
+        auth_client1,
+        recurring_activity_data,
+        media_data,
+    ):
+        response = auth_client1.post(
+            self.url,
+            data=recurring_activity_data,
+            files=media_data,
+        )
+        assert response.status_code == 400
+        data = response.json()
+        assert "schedule_pk" in data

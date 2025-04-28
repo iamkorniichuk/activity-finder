@@ -2,6 +2,17 @@ import pytest
 
 
 @pytest.fixture
+def document_files():
+    document1 = open("./fixtures/files/document1.pdf", "rb")
+    document2 = open("./fixtures/files/document2.png", "rb")
+
+    yield [document1, document2]
+
+    document1.close()
+    document2.close()
+
+
+@pytest.fixture
 def media_files():
     image1 = open("./fixtures/files/image1.png", "rb")
     image2 = open("./fixtures/files/image2.jpg", "rb")
@@ -18,6 +29,16 @@ def media_files():
 def media_data(media_files):
     data = {}
     for i, file in enumerate(media_files):
+        key = f"media_files[{i}]"
+        data[key] = file
+
+    yield data
+
+
+@pytest.fixture
+def invalid_media_data(document_files):
+    data = {}
+    for i, file in enumerate(document_files):
         key = f"media_files[{i}]"
         data[key] = file
 
