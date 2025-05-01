@@ -9,7 +9,7 @@ from .serializers import OptionSerializer, Option
 @with_my_list_endpoint(field_name="options", methods=["get"])
 class OptionViewSet(viewsets.ModelViewSet):
     serializer_class = OptionSerializer
-    queryset = Option.objects.all()
+    queryset = Option.objects.select_related("created_by").all()
 
     def get_permissions(self):
         return [OwnedByCurrentUserOrReadOnly("created_by")]

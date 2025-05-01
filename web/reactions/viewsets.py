@@ -12,7 +12,7 @@ class ReactionViewSet(
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
-    queryset = Reaction.objects.all()
+    queryset = Reaction.objects.select_related("activity", "created_by").all()
     serializer_class = ReactionSerializer
 
     def get_permissions(self):

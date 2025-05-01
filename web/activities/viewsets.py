@@ -9,7 +9,11 @@ from .serializers import PolymorphicActivitySerializer, Activity
 @with_my_list_endpoint(field_name="activities", methods=["get"])
 class ActivityViewSet(viewsets.ModelViewSet):
     serializer_class = PolymorphicActivitySerializer
-    queryset = Activity.objects.all()
+    queryset = (
+        Activity.objects.select_related("venue", "created_by")
+        .prefetch_related("media")
+        .all()
+    )
     parser_classes = [parsers.MultiPartParser, parsers.FormParser]
 
     def get_permissions(self):
