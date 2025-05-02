@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from drf_writable_nested.serializers import WritableNestedModelSerializer
+from rest_polymorphic.serializers import PolymorphicSerializer
 
 from .mixins import MainModelSerializerMixin, MainModelSerializerMetaclass
 
@@ -38,3 +39,21 @@ class MainWritableNestedModelSerializer(
     """
 
     pass
+
+
+class MainPolymorphicSerializer(PolymorphicSerializer):
+    """
+    Forbids changing the type on already created objects.
+    """
+
+    def run_validation(self, data):
+        if self.instance and self.resource_type_field_name in data:
+            new_type = self._get_resource_type_from_mapping(data)
+            old_type = self.instance.__class__.__name__
+            if new_type != old_type:
+                raise serializers.ValidationError(
+                    {
+                        self.resource_type_field_name: f"You can't change `{self.resource_type_field_name}` on created activity."
+                    }
+                )
+        return super().run_validation(data)

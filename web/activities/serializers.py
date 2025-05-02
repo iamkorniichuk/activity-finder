@@ -1,7 +1,6 @@
 from rest_framework import serializers
-from rest_polymorphic.serializers import PolymorphicSerializer
 
-from commons.serializers import MainModelSerializer
+from commons.serializers import MainModelSerializer, MainPolymorphicSerializer
 from files.validators import media_content_type_validator
 from users.validators import OwnedByCurrentUser
 from schedules.serializers import ScheduleSerializer
@@ -59,21 +58,9 @@ class RecurringActivitySerializer(ActivitySerializer):
         }
 
 
-class PolymorphicActivitySerializer(PolymorphicSerializer):
+class PolymorphicActivitySerializer(MainPolymorphicSerializer):
     model_serializer_mapping = {
         OneTimeActivity: OneTimeActivitySerializer,
         RecurringActivity: RecurringActivitySerializer,
     }
     resource_type_field_name = "type"
-
-    def run_validation(self, data):
-        if self.instance and self.resource_type_field_name in data:
-            new_type = self._get_resource_type_from_mapping(data)
-            old_type = self.instance.__class__.__name__
-            if new_type != old_type:
-                raise serializers.ValidationError(
-                    {
-                        self.resource_type_field_name: "You can't change `type` on created activity."
-                    }
-                )
-        return super().run_validation(data)
