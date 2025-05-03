@@ -11,6 +11,7 @@ class ReactionSerializer(MainModelSerializer):
             "pk",
             "activity",
             "created_by",
+            "type",
         )
         read_only_fields = ("pk",)
         current_user_field = "created_by"

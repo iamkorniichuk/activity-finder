@@ -2,7 +2,10 @@ from rest_framework import serializers
 from rest_framework.utils.model_meta import get_field_info
 from django.contrib.gis.db.models import PointField as ModelPointField, Manager
 
-from commons.models import TimeRangeField as ModelTimeRangeField
+from commons.models import (
+    TimeRangeField as ModelTimeRangeField,
+    FloatPairField as ModelFloatPairField,
+)
 from commons.utils import resolve_nested_attribute
 from files.models import File
 
@@ -12,7 +15,7 @@ from .utils import (
     add_fk_serializers,
     add_multiple_file_fields,
 )
-from .fields import TimeRangeField, PointField
+from .fields import TimeRangeField, PointField, FloatPairField
 
 
 class MainModelSerializerMetaclass(serializers.SerializerMetaclass):
@@ -65,6 +68,7 @@ class MainModelSerializerMixin:
 
     def __init__(self, *args, **kwargs):
         self.serializer_field_mapping[ModelTimeRangeField] = TimeRangeField
+        self.serializer_field_mapping[ModelFloatPairField] = FloatPairField
         self.serializer_field_mapping[ModelPointField] = PointField
         super().__init__(*args, **kwargs)
 

@@ -23,3 +23,12 @@ class TimeRangeField(ArrayField):
         self.model._meta.get_field(name).register_lookup(StartTransform)
         self.model._meta.get_field(name).register_lookup(EndTransform)
         self.model._meta.get_field(name).register_lookup(DurationTransform)
+
+
+class FloatPairField(ArrayField):
+    def __init__(self, min_value=None, max_value=None, *args, **kwargs):
+        self.min_value = min_value
+        self.max_value = max_value
+        kwargs["base_field"] = models.FloatField()
+        kwargs["size"] = 2
+        super().__init__(*args, **kwargs)

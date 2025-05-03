@@ -42,25 +42,45 @@ class PointField(serializers.Field):
         return Point(data)
 
 
-@extend_schema_field(
-    {
-        "type": "string",
-        "description": "Time range in `HH:MM[:SS]-HH:MM[:SS]` format.",
-    }
-)
-class TimeRangeField(serializers.ListField):
-    child = serializers.TimeField()
+class PairField(serializers.ListField):
+    separator = None
+    child = None
+
     min_length = 2
     max_length = 2
 
     def to_representation(self, data):
         representations = []
         for obj in data:
-            representations.append(self.child.to_representation(obj))
-        return "-".join(representations)
+            result = self.child.to_representation(obj)
+            representations.append(str(result))
+        return self.separator.join(representations)
 
-    def to_internal_value(self, data):
+    def to_internal_value(self, data: str):
         if isinstance(data, list):
             data = data[0]
-        data = data.split("-")
+        data = [obj.strip() for obj in data.split(self.separator)]
         return super().to_internal_value(data)
+
+
+@extend_schema_field(
+    {
+        "type": "string",
+        "description": "Time range in `HH:MM[:SS]-HH:MM[:SS]` format.",
+    }
+)
+class TimeRangeField(PairField):
+    child = serializers.TimeField()
+    separator = "-"
+
+
+class FloatPairField(PairField):
+    separator = ","
+
+    def __init__(self, **kwargs):
+        self.min_value = kwargs.pop("min_value", None)
+        self.max_value = kwargs.pop("max_value", None)
+        kwargs["child"] = serializers.FloatField(
+            min_value=self.min_value, max_value=self.max_value
+        )
+        super().__init__(**kwargs)
