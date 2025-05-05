@@ -23,8 +23,8 @@ class TestListSchedules:
         assert data["created_by"]["pk"] == signup_user.json()["pk"]
 
     def test_duplicate_days(self, auth_client, schedule_data):
-        schedule_data["work_days"][0]["day"] = 0
-        schedule_data["work_days"][1]["day"] = 0
+        schedule_data["work_days"][0]["week_day"] = 0
+        schedule_data["work_days"][1]["week_day"] = 0
         response = auth_client.post(self.url, json=schedule_data)
         assert response.status_code == 400
 

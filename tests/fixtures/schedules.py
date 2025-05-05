@@ -6,27 +6,27 @@ def schedule_data():
     yield {
         "work_days": [
             {
-                "day": 0,
+                "week_day": 0,
                 "work_hours": "08:00-19:30",
                 "break_hours": ["13:00:00-14:00:00", "17:00:00-17:30:00"],
             },
             {
-                "day": 1,
+                "week_day": 1,
                 "work_hours": "08:00-18:00",
                 "break_hours": ["13:00:00-14:00:00"],
             },
             {
-                "day": 2,
+                "week_day": 2,
                 "work_hours": "08:00-18:00",
                 "break_hours": ["13:00:00-14:00:00"],
             },
             {
-                "day": 3,
+                "week_day": 3,
                 "work_hours": "08:00:00-18:00:00",
                 "break_hours": ["13:00:00-14:00:00"],
             },
             {
-                "day": 4,
+                "week_day": 4,
                 "work_hours": "08:00:00-18:00:00",
             },
         ],
