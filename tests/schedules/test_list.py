@@ -1,3 +1,6 @@
+from copy import copy
+
+
 class TestListSchedules:
     url = "/schedules/"
 
@@ -34,6 +37,12 @@ class TestListSchedules:
         assert response.status_code == 400
 
     def test_indivisible_interval(self, auth_client, schedule_data):
-        schedule_data["work_days"][0]["work_hours"] = "00:08:00-00:17:30"
-        response = auth_client.post(self.url, json=schedule_data)
+        data = copy(schedule_data)
+        data["work_days"][0]["work_hours"] = "00:08:00-00:17:30"
+        response = auth_client.post(self.url, json=data)
+        assert response.status_code == 400
+
+        data = copy(schedule_data)
+        data["work_days"][4]["work_hours"] = "16:00:00-17:30:00"
+        response = auth_client.post(self.url, json=data)
         assert response.status_code == 400

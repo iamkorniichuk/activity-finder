@@ -25,8 +25,8 @@ class ActivitySerializer(MainModelSerializer):
         fk_serializers = {"venue": {"serializer": VenueSerializer}}
 
     def validate(self, data):
-        venue = self.get_current("venue", data)
-        is_remote = self.get_current("is_remote", data)
+        venue = data.get("venue") or self.get_current("venue")
+        is_remote = data.get("is_remote") or self.get_current("is_remote")
         if not is_remote and not venue:
             raise serializers.ValidationError(
                 {"venue": "Required when `is_remote` is false."}

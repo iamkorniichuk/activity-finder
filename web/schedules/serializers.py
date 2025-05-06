@@ -32,13 +32,15 @@ class ScheduleSerializer(MainWritableNestedModelSerializer):
         return data
 
     def validate(self, data):
-        duration = self.get_current("booking_duration", data)
+        booking_duration = data.get("booking_duration") or self.get_current(
+            "booking_duration"
+        )
+        work_days = data.get("work_days") or self.get_current("work_days")
 
-        for day in self.get_current("work_days", data):
+        for day in work_days:
             work_start, work_end = day["work_hours"]
 
             breaks = day.get("break_hours")
-            # Handle `None` instance's value and missing value in request
             if breaks is None:
                 breaks = []
             breaks.append([work_end, None])
@@ -47,7 +49,7 @@ class ScheduleSerializer(MainWritableNestedModelSerializer):
                 work_end = break_start
 
                 delta = time_difference(work_start, work_end)
-                if delta % duration.total_seconds() != 0:
+                if delta % booking_duration.total_seconds() != 0:
                     raise serializers.ValidationError(
                         {
                             "work_days": f"Interval {work_start}-{work_end} is not divisible by `booking_duration`."

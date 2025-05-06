@@ -1,12 +1,11 @@
 from rest_framework import serializers
 from rest_framework.utils.model_meta import get_field_info
-from django.contrib.gis.db.models import PointField as ModelPointField, Manager
+from django.contrib.gis.db.models import PointField as ModelPointField, Manager, Model
 
 from commons.models import (
     TimeRangeField as ModelTimeRangeField,
     FloatPairField as ModelFloatPairField,
 )
-from commons.utils import resolve_nested_attribute
 from files.models import File
 
 from .utils import (
@@ -72,22 +71,22 @@ class MainModelSerializerMixin:
         self.serializer_field_mapping[ModelPointField] = PointField
         super().__init__(*args, **kwargs)
 
-    def get_current(self, key, data):
-        if key in data:
-            return data[key]
+    def get_current(self, field_name):
+        field = self.fields[field_name]
 
-        if key in self.initial_data:
-            return self.initial_data[key]
+        if field_name in self.initial_data:
+            return field.to_internal_value(self.initial_data[field_name])
 
         if self.instance:
-            field = self.fields[key]
-            value = resolve_nested_attribute(self.instance, field.source)
-            if isinstance(value, Manager):
-                value = value.all()
+            value = field.get_attribute(self.instance)
+
+            if isinstance(value, (Model, Manager)):
+                value = field.to_representation(value)
+
             if value is None:
                 return None
 
-            return field.to_internal_value(field.to_representation(value))
+            return field.to_internal_value(value)
 
     def _save_multiple_file(self, instance, files):
         for field_name, files in files.items():
