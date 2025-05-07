@@ -19,6 +19,7 @@ urlpatterns = [
     ),
     path("activities/", include("activities.urls"), name="activities"),
     path("auth/", include("authentication.urls"), name="authentication"),
+    path("bookings/", include("bookings.urls"), name="bookings"),
     path("layouts/", include("layouts.urls"), name="layouts"),
     path("options/", include("options.urls"), name="options"),
     path("reactions/", include("reactions.urls"), name="reactions"),

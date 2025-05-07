@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "activities",
     "authentication",
+    "bookings",
     "commons",
     "files",
     "layouts",

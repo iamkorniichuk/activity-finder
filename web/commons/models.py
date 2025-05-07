@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 
-from .lookups import StartTransform, EndTransform, DurationTransform
+from .lookups import StartTransform, EndTransform, DurationTransform, WithinTransform
 
 
 class TimeRangeField(ArrayField):
@@ -23,6 +23,7 @@ class TimeRangeField(ArrayField):
         self.model._meta.get_field(name).register_lookup(StartTransform)
         self.model._meta.get_field(name).register_lookup(EndTransform)
         self.model._meta.get_field(name).register_lookup(DurationTransform)
+        self.model._meta.get_field(name).register_lookup(WithinTransform)
 
 
 class FloatPairField(ArrayField):

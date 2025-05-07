@@ -26,3 +26,15 @@ class DurationTransform(models.Transform):
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
         return f"{lhs}[2] - {lhs}[1]", params
+
+
+class WithinTransform(models.Transform):
+    lookup_name = "within"
+    output_field = models.BooleanField()
+
+    def as_sql(self, compiler, connection):
+        lhs, params = compiler.compile(self.lhs)
+        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
+
+        sql = f"{lhs}[1] <= {rhs_sql} AND {rhs_sql} < {lhs}[2]"
+        return sql, params + rhs_params
