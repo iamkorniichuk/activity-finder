@@ -18,7 +18,7 @@ class Reaction(models.Model):
     type = models.CharField(max_length=16, choices=TypeChoices.choices)
 
     def __str__(self):
-        return self.pk
+        return str(self.pk)
 
     def __repr__(self):
         return f"Reaction({self.pk})"

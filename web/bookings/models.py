@@ -17,7 +17,7 @@ class Booking(models.Model):
     note = models.TextField(blank=True, default="")
 
     def __str__(self):
-        return self.pk
+        return str(self.pk)
 
     def __repr__(self):
         return f"Booking({self.pk})"

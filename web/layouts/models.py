@@ -17,7 +17,7 @@ class Layout(models.Model):
     created_by = models.ForeignKey(User, models.PROTECT)
 
     def __str__(self):
-        return self.pk
+        return str(self.pk)
 
     def __repr__(self):
         return f"Layout({self.pk})"
@@ -34,7 +34,7 @@ class VisualObject(PolymorphicModel):
     layout = models.ForeignKey(Layout, models.CASCADE)
 
     def __str__(self):
-        return self.pk
+        return str(self.pk)
 
     def __repr__(self):
         return f"VisualObject({self.pk})"

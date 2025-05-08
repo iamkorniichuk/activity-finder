@@ -11,7 +11,7 @@ class WorkDay(models.Model):
     break_hours = ArrayField(TimeRangeField(), blank=True, null=True)
 
     def __str__(self):
-        return self.pk
+        return str(self.pk)
 
     def __repr__(self):
         return f"WorkDay({self.pk})"
@@ -26,7 +26,7 @@ class Schedule(models.Model):
     created_by = models.ForeignKey(User, models.CASCADE)
 
     def __str__(self):
-        return self.pk
+        return str(self.pk)
 
     def __repr__(self):
         return f"Schedule({self.pk})"
