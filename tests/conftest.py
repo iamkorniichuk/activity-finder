@@ -1,5 +1,6 @@
 pytest_plugins = [
     "fixtures.activities",
+    "fixtures.bookings",
     "fixtures.clients",
     "fixtures.files",
     "fixtures.layouts",
