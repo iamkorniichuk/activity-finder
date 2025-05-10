@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
-from commons.models import TimeRangeField, WeekDayField
+from commons.models import TimeRangeField, WeekDayField, with_history
 from users.models import User
 
 
@@ -17,6 +17,7 @@ class WorkDay(models.Model):
         return f"WorkDay({self.pk})"
 
 
+@with_history()
 class Schedule(models.Model):
     class Meta:
         default_related_name = "schedules"

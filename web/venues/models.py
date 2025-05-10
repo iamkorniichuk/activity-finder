@@ -1,9 +1,11 @@
 from django.contrib.gis.db import models
 
+from commons.models import with_history
 from users.models import User
 from files.models import File
 
 
+@with_history()
 class Venue(models.Model):
     name = models.CharField(max_length=64)
     description = models.TextField()

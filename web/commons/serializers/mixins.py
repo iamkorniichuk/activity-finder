@@ -122,6 +122,14 @@ class MainModelSerializerMixin:
         return instance
 
     def update(self, instance, validated_data):
+        with_history_support = getattr(self.Meta.model, "with_history_support", False)
+        if with_history_support:
+            validated_data["previous_version"] = instance
+            instance_data = {}
+            for field in instance._meta.get_fields():
+                instance_data[field.name] = getattr(instance, field.name)
+            return self.create(instance_data | validated_data)
+
         files = self._pop_multiple_files(validated_data)
         instance = super().update(instance, validated_data)
         if files is not None:

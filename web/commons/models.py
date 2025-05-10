@@ -49,3 +49,27 @@ class WeekDayField(models.PositiveSmallIntegerField):
     def __init__(self, *args, **kwargs):
         kwargs["choices"] = WeekDayChoices.choices
         super().__init__(*args, **kwargs)
+
+
+def with_history():
+    def decorator(base_cls):
+        previous_version_field = models.OneToOneField(
+            "self",
+            models.PROTECT,
+            null=True,
+            blank=True,
+            editable=False,
+            related_name="child",
+        )
+        edited_at_field = models.DateTimeField(
+            auto_now=True,
+            blank=True,
+            editable=False,
+        )
+        base_cls.add_to_class("previous_version", previous_version_field)
+        base_cls.add_to_class("edited_at", edited_at_field)
+        setattr(base_cls, "with_history_support", True)
+
+        return base_cls
+
+    return decorator

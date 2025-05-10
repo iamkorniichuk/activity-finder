@@ -1,11 +1,12 @@
 from django.db import models
 from polymorphic.models import PolymorphicModel
 
-from commons.models import FloatPairField
+from commons.models import FloatPairField, with_history
 from venues.models import Venue
 from users.models import User
 
 
+@with_history()
 class Layout(models.Model):
     class Meta:
         default_related_name = "layouts"
