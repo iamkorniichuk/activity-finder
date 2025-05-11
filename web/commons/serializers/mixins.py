@@ -1,3 +1,4 @@
+from copy import copy
 from rest_framework import serializers
 from rest_framework.utils.model_meta import get_field_info
 from django.contrib.gis.db.models import PointField as ModelPointField, Manager, Model
@@ -124,11 +125,13 @@ class MainModelSerializerMixin:
     def update(self, instance, validated_data):
         with_history_support = getattr(self.Meta.model, "with_history_support", False)
         if with_history_support:
-            validated_data["previous_version"] = instance
-            instance_data = {}
-            for field in instance._meta.get_fields():
-                instance_data[field.name] = getattr(instance, field.name)
-            return self.create(instance_data | validated_data)
+            previous_version = copy(instance)
+            previous_version.is_current = False
+            previous_version.save()
+
+            instance.pk = None
+            instance.previous_version = previous_version
+            instance.save()
 
         files = self._pop_multiple_files(validated_data)
         instance = super().update(instance, validated_data)

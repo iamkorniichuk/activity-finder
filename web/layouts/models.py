@@ -10,7 +10,13 @@ from users.models import User
 class Layout(models.Model):
     class Meta:
         default_related_name = "layouts"
-        unique_together = ("name", "venue")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("name", "venue"),
+                condition=models.Q(is_current=True),
+                name="unique_current_layout_name",
+            )
+        ]
 
     name = models.CharField(max_length=64)
     size = FloatPairField()

@@ -9,7 +9,13 @@ from users.models import User
 class Option(models.Model):
     class Meta:
         default_related_name = "options"
-        unique_together = ("name", "activity")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("name", "activity"),
+                condition=models.Q(is_current=True),
+                name="unique_current_option_per_activity",
+            )
+        ]
 
     name = models.CharField(max_length=32)
     description = models.TextField()

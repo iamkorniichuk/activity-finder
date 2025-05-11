@@ -3,12 +3,11 @@ from polymorphic.models import PolymorphicModel
 
 from users.models import User
 from venues.models import Venue
-from commons.models import TimeRangeField, with_history
+from commons.models import TimeRangeField
 from schedules.models import Schedule
 from files.models import File
 
 
-@with_history()
 class Activity(PolymorphicModel):
     class Meta:
         default_related_name = "activities"

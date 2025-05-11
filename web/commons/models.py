@@ -61,12 +61,14 @@ def with_history():
             editable=False,
             related_name="child",
         )
+        is_current_field = models.BooleanField(default=True, blank=True, editable=True)
         edited_at_field = models.DateTimeField(
             auto_now=True,
             blank=True,
             editable=False,
         )
         base_cls.add_to_class("previous_version", previous_version_field)
+        base_cls.add_to_class("is_current", is_current_field)
         base_cls.add_to_class("edited_at", edited_at_field)
         setattr(base_cls, "with_history_support", True)
 
