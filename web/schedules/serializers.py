@@ -8,8 +8,9 @@ from .models import Schedule, WorkDay
 class WorkDaySerializer(MainWritableNestedModelSerializer):
     class Meta:
         model = WorkDay
-        fields = ("week_day", "work_hours", "break_hours")
+        fields = ("week_day", "work_hours", "break_hours", "slots")
         choice_fields = ("week_day",)
+        read_only_fields = ("slots",)
 
 
 class ScheduleSerializer(MainWritableNestedModelSerializer):
@@ -38,27 +39,32 @@ class ScheduleSerializer(MainWritableNestedModelSerializer):
         work_days = data.get("work_days") or self.get_current("work_days")
 
         for day in work_days:
-            work_start, work_end = day["work_hours"]
+            work_hours = day["work_hours"]
+            break_hours = day.get("break_hours")
+            # Handling when `break_hours` is missing and when it's `None`
+            if break_hours is None:
+                break_hours = []
 
-            breaks = day.get("break_hours")
-            if breaks is None:
-                breaks = []
-            breaks.append([work_end, None])
-
-            for break_start, break_end in breaks:
-                work_end = break_start
-
-                delta = time_difference(work_start, work_end)
-                if delta % booking_duration.total_seconds() != 0:
-                    raise serializers.ValidationError(
-                        {
-                            "work_days": f"Interval {work_start}-{work_end} is not divisible by `booking_duration`."
-                        }
-                    )
-
-                work_start = break_end
+            self.validate_divisible_hours(booking_duration, work_hours, break_hours)
 
         return data
+
+    def validate_divisible_hours(self, booking_duration, work_hours, break_hours):
+        work_start, work_end = work_hours
+        break_hours.append([work_end, None])
+
+        for break_start, break_end in break_hours:
+            work_end = break_start
+
+            delta = time_difference(work_start, work_end)
+            if delta % booking_duration.total_seconds() != 0:
+                raise serializers.ValidationError(
+                    {
+                        "work_days": f"Interval {work_start}-{work_end} is not divisible by `booking_duration`."
+                    }
+                )
+
+            work_start = break_end
 
 
 def time_difference(minuend, subtrahend):
