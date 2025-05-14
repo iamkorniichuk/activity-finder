@@ -8,8 +8,8 @@ from .models import Schedule, WorkDay
 class WorkDaySerializer(MainWritableNestedModelSerializer):
     class Meta:
         model = WorkDay
-        fields = ("day", "work_hours", "break_hours")
-        choice_fields = ("day",)
+        fields = ("week_day", "work_hours", "break_hours")
+        choice_fields = ("week_day",)
 
 
 class ScheduleSerializer(MainWritableNestedModelSerializer):
@@ -26,7 +26,7 @@ class ScheduleSerializer(MainWritableNestedModelSerializer):
     work_days = WorkDaySerializer(many=True)
 
     def validate_work_days(self, data):
-        unique_days = set([obj["day"] for obj in data])
+        unique_days = set([obj["week_day"] for obj in data])
         if len(unique_days) < len(data):
             raise serializers.ValidationError("Each day needs to be unique")
         return data

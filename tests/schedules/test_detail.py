@@ -23,12 +23,12 @@ class TestDetailSchedules:
         data = {
             "work_days": [
                 {
-                    "day": 0,
+                    "week_day": 0,
                     "work_hours": "08:00-18:00",
                     "break_hours": ["13:00:00-14:00:00"],
                 },
                 {
-                    "day": 1,
+                    "week_day": 1,
                     "work_hours": "08:00-18:00",
                 },
             ]

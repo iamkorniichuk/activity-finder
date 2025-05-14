@@ -4,23 +4,16 @@ from django.contrib.postgres.fields import ArrayField
 from commons.models import TimeRangeField
 from users.models import User
 
+from .fields import WeekDayField
+
 
 class WorkDay(models.Model):
-    class WeekDayChoices(models.IntegerChoices):
-        MONDAY = 0, "monday"
-        TUESDAY = 1, "tuesday"
-        WEDNESDAY = 2, "wednesday"
-        THURSDAY = 3, "thursday"
-        FRIDAY = 4, "friday"
-        SATURDAY = 5, "saturday"
-        SUNDAY = 6, "sunday"
-
-    day = models.PositiveSmallIntegerField(choices=WeekDayChoices.choices)
+    week_day = WeekDayField()
     work_hours = TimeRangeField()
     break_hours = ArrayField(TimeRangeField(), blank=True, null=True)
 
     def __str__(self):
-        return self.get_day_display()
+        return self.pk
 
     def __repr__(self):
         return f"WorkDay({self.pk})"
