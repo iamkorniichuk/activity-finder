@@ -7,4 +7,4 @@ COPY . .
 RUN pip install --upgrade --root-user-action=ignore pip && \
     pip install -r requirements.txt
 
-CMD ["pytest"]
+CMD ["pytest", "-n", "auto"]
