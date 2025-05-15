@@ -7,7 +7,7 @@ class TerritorySerializer(MainModelSerializer):
     class Meta:
         model = Territory
         fields = (
-            "id",
+            "pk",
             "code",
             "name",
             "type",
