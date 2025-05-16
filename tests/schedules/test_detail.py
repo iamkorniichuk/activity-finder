@@ -9,14 +9,50 @@ class TestDetailSchedules:
         response = client.get(url)
         assert response.status_code == 200
         data = response.json()
-        assert isinstance(data, dict)
+        correct_slots = [
+            "08:00:00",
+            "09:00:00",
+            "10:00:00",
+            "11:00:00",
+            "12:00:00",
+            "14:00:00",
+            "15:00:00",
+            "16:00:00",
+            "17:30:00",
+            "18:30:00",
+        ]
+        assert data["work_days"][0]["slots"] == correct_slots
 
     def test_successful_duration_patch(self, auth_client, create_schedule):
         url = self.build_url(create_schedule.json()["pk"])
         data = {"booking_duration": "00:30:00"}
         response = auth_client.patch(url, json=data)
         assert response.status_code == 200
-        assert response.json()["booking_duration"] == data["booking_duration"]
+        data = response.json()
+        assert data["booking_duration"] == data["booking_duration"]
+        correct_slots = [
+            "08:00:00",
+            "08:30:00",
+            "09:00:00",
+            "09:30:00",
+            "10:00:00",
+            "10:30:00",
+            "11:00:00",
+            "11:30:00",
+            "12:00:00",
+            "12:30:00",
+            "14:00:00",
+            "14:30:00",
+            "15:00:00",
+            "15:30:00",
+            "16:00:00",
+            "16:30:00",
+            "17:30:00",
+            "18:00:00",
+            "18:30:00",
+            "19:00:00",
+        ]
+        assert data["work_days"][0]["slots"] == correct_slots
 
     def test_successful_work_days_patch(self, auth_client, create_schedule):
         url = self.build_url(create_schedule.json()["pk"])
@@ -35,6 +71,19 @@ class TestDetailSchedules:
         }
         response = auth_client.patch(url, json=data)
         assert response.status_code == 200
+        data = response.json()
+        correct_slots = [
+            "08:00:00",
+            "09:00:00",
+            "10:00:00",
+            "11:00:00",
+            "12:00:00",
+            "14:00:00",
+            "15:00:00",
+            "16:00:00",
+            "17:00:00",
+        ]
+        assert data["work_days"][0]["slots"] == correct_slots
 
     def test_indivisible_interval(self, auth_client, create_schedule):
         url = self.build_url(create_schedule.json()["pk"])
