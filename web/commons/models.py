@@ -2,8 +2,6 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 
-from .lookups import StartTransform, EndTransform, DurationTransform, WithinTransform
-
 
 class TimeRangeField(ArrayField):
     def __init__(self, *args, **kwargs):
@@ -17,13 +15,6 @@ class TimeRangeField(ArrayField):
         start, end = value
         if start >= end:
             raise ValidationError("`end` value must be greater than `start` value.")
-
-    def contribute_to_class(self, cls, name, **kwargs):
-        super().contribute_to_class(cls, name, **kwargs)
-        self.model._meta.get_field(name).register_lookup(StartTransform)
-        self.model._meta.get_field(name).register_lookup(EndTransform)
-        self.model._meta.get_field(name).register_lookup(DurationTransform)
-        self.model._meta.get_field(name).register_lookup(WithinTransform)
 
 
 class FloatPairField(ArrayField):

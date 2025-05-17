@@ -131,7 +131,6 @@ class MainModelSerializerMixin:
 
             instance.pk = None
             instance.previous_version = previous_version
-            instance.save()
 
         files = self._pop_multiple_files(validated_data)
         instance = super().update(instance, validated_data)
