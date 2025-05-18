@@ -2,7 +2,7 @@ from copy import copy
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
-from commons.models import TimeRangeField, WeekDayField, with_history
+from commons.models import TimeRangeField, WeekDayField
 from commons.time import TimeWrapper
 from users.models import User
 
@@ -28,7 +28,6 @@ def generate_slots(booking_duration, work_hours, break_hours):
     return slots
 
 
-@with_history
 class Schedule(models.Model):
     class Meta:
         default_related_name = "schedules"

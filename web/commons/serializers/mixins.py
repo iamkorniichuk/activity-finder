@@ -1,4 +1,3 @@
-from copy import copy
 from rest_framework import serializers
 from rest_framework.utils.model_meta import get_field_info
 from django.contrib.gis.db.models import PointField as ModelPointField, Manager, Model
@@ -19,16 +18,6 @@ from .fields import TimeRangeField, PointField, FloatPairField
 
 
 class MainModelSerializerMetaclass(serializers.SerializerMetaclass):
-    """
-    Adds new attributes to `Meta`:
-    - `current_user_field` takes a field and implicitly sets its value to current user's model
-    - `choice_display_fields` takes a list of fields and adds `<name>_display` read-only field pair to each of them
-    - `fk_serializers` takes a dict `{"<field_name>": {"serializer": <serializer_class>}, **extra_kwargs}` and creates `<name>_pk` field pair that expects pk
-
-    Attributes that need `MainModelSerializerMixin` to work:
-    - `multiple_file_fields` takes a dict `{"<field_name>": <extra_file_field_kwargs>}` and makes set fields to work for multiple file upload
-    """
-
     def __new__(cls, name, bases, attrs):
         meta = attrs.get("Meta", None)
         if meta:
@@ -56,16 +45,6 @@ class MainModelSerializerMetaclass(serializers.SerializerMetaclass):
 
 
 class MainModelSerializerMixin:
-    """
-    Adds new attributes to `Meta`:
-    - `current_user_field` takes a field and implicitly sets its value to current user's model
-    - `choice_display_fields` takes a list of fields and adds `<name>_display` read-only field pair to each of them
-    - `fk_serializers` takes a dict `{"<field_name>": {"serializer": <serializer_class>}, **extra_kwargs}` and creates `<name>_pk` field pair that expects pk
-
-    Attributes that need `MainModelSerializerMixin` to work:
-    - `multiple_file_fields` takes a dict `{"<field_name>": <extra_file_field_kwargs>}` and makes set fields to work for multiple file upload
-    """
-
     def __init__(self, *args, **kwargs):
         self.serializer_field_mapping[ModelTimeRangeField] = TimeRangeField
         self.serializer_field_mapping[ModelFloatPairField] = FloatPairField
@@ -123,15 +102,6 @@ class MainModelSerializerMixin:
         return instance
 
     def update(self, instance, validated_data):
-        with_history_support = getattr(self.Meta.model, "with_history_support", False)
-        if with_history_support:
-            previous_version = copy(instance)
-            previous_version.is_current = False
-            previous_version.save()
-
-            instance.pk = None
-            instance.previous_version = previous_version
-
         files = self._pop_multiple_files(validated_data)
         instance = super().update(instance, validated_data)
         if files is not None:

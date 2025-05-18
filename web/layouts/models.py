@@ -1,22 +1,14 @@
 from django.db import models
 from polymorphic.models import PolymorphicModel
 
-from commons.models import FloatPairField, with_history
+from commons.models import FloatPairField
 from venues.models import Venue
 from users.models import User
 
 
-@with_history()
 class Layout(models.Model):
     class Meta:
         default_related_name = "layouts"
-        constraints = [
-            models.UniqueConstraint(
-                fields=("name", "venue"),
-                condition=models.Q(is_current=True),
-                name="unique_current_layout_name",
-            )
-        ]
 
     name = models.CharField(max_length=64)
     size = FloatPairField()
