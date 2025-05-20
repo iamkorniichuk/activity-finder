@@ -7,7 +7,7 @@ class TestListLayouts:
     def test_successful_get(self, client):
         response = client.get(self.url)
         assert response.status_code == 200
-        data = response.json()
+        data = response.json()["results"]
         assert isinstance(data, list)
 
     def test_exceed_limits(self, auth_client, layout_data):

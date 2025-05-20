@@ -8,6 +8,7 @@ from options.models import Option
 class Booking(models.Model):
     class Meta:
         default_related_name = "bookings"
+        ordering = ["booked_at", "pk"]
 
     booked_by = models.ForeignKey(User, models.CASCADE)
     booked_at = models.DateTimeField(auto_now_add=True)

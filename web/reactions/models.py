@@ -8,6 +8,7 @@ class Reaction(models.Model):
     class Meta:
         default_related_name = "reactions"
         unique_together = ("activity", "created_by")
+        ordering = ["pk"]
 
     class TypeChoices(models.TextChoices):
         LIKE = "like", "Like"

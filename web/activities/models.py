@@ -11,6 +11,7 @@ from files.models import File
 class Activity(PolymorphicModel):
     class Meta:
         default_related_name = "activities"
+        ordering = ["name", "pk"]
 
     name = models.CharField(max_length=64)
     description = models.TextField()
@@ -27,7 +28,7 @@ class Activity(PolymorphicModel):
 
 
 class OneTimeActivity(Activity):
-    class Meta:
+    class Meta(Activity.Meta):
         default_related_name = "one_time_activities"
 
     time_range = TimeRangeField()
@@ -38,7 +39,7 @@ class OneTimeActivity(Activity):
 
 
 class RecurringActivity(Activity):
-    class Meta:
+    class Meta(Activity.Meta):
         default_related_name = "recurring_activities"
 
     schedule = models.ForeignKey(Schedule, models.CASCADE)

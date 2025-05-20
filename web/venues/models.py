@@ -5,6 +5,9 @@ from files.models import File
 
 
 class Venue(models.Model):
+    class Meta:
+        ordering = ["name", "created_at", "pk"]
+
     name = models.CharField(max_length=64)
     description = models.TextField()
     route = models.ManyToManyField(

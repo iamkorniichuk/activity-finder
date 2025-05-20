@@ -7,6 +7,7 @@ from users.models import User
 class Option(models.Model):
     class Meta:
         default_related_name = "options"
+        ordering = ["name", "pk"]
 
     name = models.CharField(max_length=32)
     description = models.TextField()

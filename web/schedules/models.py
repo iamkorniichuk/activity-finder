@@ -31,6 +31,7 @@ def generate_slots(booking_duration, work_hours, break_hours):
 class Schedule(models.Model):
     class Meta:
         default_related_name = "schedules"
+        ordering = ["pk"]
 
     booking_duration = models.DurationField()
     created_by = models.ForeignKey(User, models.CASCADE)

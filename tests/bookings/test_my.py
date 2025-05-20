@@ -4,7 +4,7 @@ class TestMyListBookings:
     def test_successful_get(self, auth_client):
         response = auth_client.get(self.url)
         assert response.status_code == 200
-        data = response.json()
+        data = response.json()["results"]
         assert isinstance(data, list)
 
     def test_invalid_method(self, auth_client):

@@ -9,6 +9,7 @@ from users.models import User
 class Layout(models.Model):
     class Meta:
         default_related_name = "layouts"
+        ordering = ["name", "pk"]
 
     name = models.CharField(max_length=64)
     size = FloatPairField()

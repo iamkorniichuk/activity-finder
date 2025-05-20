@@ -7,7 +7,7 @@ class TestListSchedules:
     def test_successful_get(self, client):
         response = client.get(self.url)
         assert response.status_code == 200
-        data = response.json()
+        data = response.json()["results"]
         assert isinstance(data, list)
 
     def test_overwrite_created_by(self, auth_client, signup_user, schedule_data: dict):
