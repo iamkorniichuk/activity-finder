@@ -3,7 +3,7 @@ from rest_framework import viewsets, mixins
 from commons.viewsets import with_my_list_endpoint
 from users.permissions import OwnedByCurrentUser
 
-from .serializers import Booking, SensitiveBookingSerializer
+from .serializers import Booking, BookingSerializer
 
 
 @with_my_list_endpoint(field_name="bookings", methods=["get"])
@@ -12,7 +12,7 @@ class BookingViewSet(
     viewsets.GenericViewSet,
 ):
     queryset = Booking.objects.select_related("option", "booked_by").all()
-    serializer_class = SensitiveBookingSerializer
+    serializer_class = BookingSerializer
 
     def get_permissions(self):
         return [OwnedByCurrentUser("booked_by")]

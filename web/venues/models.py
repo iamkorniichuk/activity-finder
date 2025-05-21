@@ -19,6 +19,7 @@ class Venue(models.Model):
     created_by = models.ForeignKey(User, models.PROTECT, related_name="venues")
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     media = models.ManyToManyField(File, related_name="media_venues")
+    is_published = models.BooleanField(default=False, blank=True, editable=False)
 
     def __str__(self):
         return self.name

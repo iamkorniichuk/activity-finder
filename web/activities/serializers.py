@@ -18,11 +18,21 @@ class ActivitySerializer(MainModelSerializer):
             "venue",
             "is_remote",
             "media",
+            "is_published",
         )
-        read_only_fields = ("pk",)
+        read_only_fields = ("pk", "is_published")
         current_user_field = "created_by"
         multiple_file_fields = {"media": {"validators": [media_content_type_validator]}}
         fk_serializers = {"venue": {"serializer": VenueSerializer}}
+
+    def validate_venue(self, venue):
+        if venue is None:
+            return
+
+        if not venue.is_published:
+            raise serializers.ValidationError(
+                {"venue_pk": "The object is not published."}
+            )
 
     def validate(self, data):
         venue = data.get("venue") or self.get_current("venue")

@@ -17,8 +17,9 @@ class VenueSerializer(MainModelSerializer):
             "created_at",
             "media",
             "layouts",
+            "is_published",
         )
-        read_only_fields = ("pk", "created_at")
+        read_only_fields = ("pk", "created_at", "is_published")
         current_user_field = "created_by"
         multiple_file_fields = {
             "media": {"validators": [media_content_type_validator]},

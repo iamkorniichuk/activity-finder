@@ -19,6 +19,7 @@ class Activity(PolymorphicModel):
     venue = models.ForeignKey(Venue, models.PROTECT, null=True, blank=True)
     is_remote = models.BooleanField()
     media = models.ManyToManyField(File)
+    is_published = models.BooleanField(default=False, blank=True, editable=False)
 
     def __str__(self):
         return self.name

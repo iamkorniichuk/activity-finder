@@ -9,23 +9,17 @@ from .models import Booking
 class BookingSerializer(MainModelSerializer):
     class Meta:
         model = Booking
-        fields = ("pk", "week_day", "time")
-        read_only_fields = ("pk",)
-        choice_display_fields = ("week_day",)
-
-
-def within_time_range(time, time_range):
-    return time >= time_range[0] and time < time_range[1]
-
-
-class SensitiveBookingSerializer(BookingSerializer):
-    class Meta(BookingSerializer.Meta):
-        fields = BookingSerializer.Meta.fields + (
+        fields = (
+            "pk",
+            "week_day",
+            "time",
             "booked_by",
             "booked_at",
             "option",
             "note",
         )
+        read_only_fields = ("pk",)
+        choice_display_fields = ("week_day",)
         current_user_field = "booked_by"
         fk_serializers = {
             "option": {"serializer": OptionSerializer},
