@@ -2,9 +2,9 @@ import pytest
 
 
 @pytest.fixture
-def reaction_data(create_recurring_activity):
+def reaction_data(publish_recurring_activity):
     yield {
-        "activity_pk": create_recurring_activity.json()["pk"],
+        "activity_pk": publish_recurring_activity.json()["pk"],
         "type": "like",
     }
 

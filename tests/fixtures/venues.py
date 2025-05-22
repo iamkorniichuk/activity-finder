@@ -20,3 +20,11 @@ def create_venue(auth_client, venue_data, media_data, route_data):
     )
     assert response.status_code == 201
     yield response
+
+
+@pytest.fixture
+def publish_venue(auth_client, create_venue, create_layout):
+    url = f"/venues/{create_venue.json()['pk']}/publish/"
+    response = auth_client.post(url)
+    assert response.status_code == 200
+    yield response

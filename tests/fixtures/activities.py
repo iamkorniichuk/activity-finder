@@ -25,14 +25,22 @@ def create_recurring_activity(auth_client, recurring_activity_data, media_data):
 
 
 @pytest.fixture
-def one_time_activity_data(create_venue):
+def publish_recurring_activity(auth_client, create_recurring_activity, create_option):
+    url = f"/activities/{create_recurring_activity.json()['pk']}/publish/"
+    response = auth_client.post(url)
+    assert response.status_code == 200
+    yield response
+
+
+@pytest.fixture
+def one_time_activity_data(publish_venue):
     yield {
         "name": "Music Concert",
         "type": "OneTimeActivity",
         "description": "Listen to your favorite music in live!",
         "date": "2025-06-11",
         "time_range": "12:00:00-19:00:00",
-        "venue_pk": create_venue.json()["pk"],
+        "venue_pk": publish_venue.json()["pk"],
         "is_remote": False,
     }
 
@@ -45,4 +53,12 @@ def create_one_time_activity(auth_client, one_time_activity_data, media_data):
         files=media_data,
     )
     assert response.status_code == 201
+    yield response
+
+
+@pytest.fixture
+def publish_one_time_activity(auth_client, create_one_time_activity):
+    url = f"/activities/{create_one_time_activity.json()['pk']}/publish/"
+    response = auth_client.post(url)
+    assert response.status_code == 200
     yield response
