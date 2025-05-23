@@ -13,7 +13,8 @@ from .models import VisualObject, Seat, SeatZone, Layout
 class VisualObjectSerializer(MainModelSerializer):
     class Meta:
         model = VisualObject
-        fields = ("name", "position", "size", "rotation")
+        fields = ("pk", "name", "position", "size", "rotation")
+        read_only_fields = ("pk",)
         extra_kwargs = {
             "position": {"min_value": 0, "max_value": 2560},
             "size": {"min_value": 8, "max_value": 2180},
