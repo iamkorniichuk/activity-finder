@@ -91,6 +91,7 @@ def with_my_list_endpoint(
     field_name,
     methods=["get", "post"],
     endpoint_name="my",
+    has_pagination=False,
 ):
     """
     Adds a `my/` endpoint to a model's `ViewSet`, allowing interaction
@@ -111,6 +112,13 @@ def with_my_list_endpoint(
         prefix = "_my_list"
 
         original_get_queryset = base_cls.get_queryset
+        original_paginate_queryset = base_cls.paginate_queryset
+
+        def new_paginate_queryset(self, queryset):
+            current_action = getattr(self, "action", None)
+            if current_action == endpoint_name:
+                return None
+            return original_paginate_queryset(self, queryset)
 
         def new_get_queryset(self):
             current_action = getattr(self, "action", None)
@@ -125,6 +133,10 @@ def with_my_list_endpoint(
 
             method_name = method_action_map[request.method] + prefix
             return getattr(self, method_name)(request, *self.args, **self.kwargs)
+
+        if not has_pagination:
+            new_paginate_queryset.__name__ = "paginate_queryset"
+            setattr(base_cls, "paginate_queryset", new_paginate_queryset)
 
         new_get_queryset.__name__ = "get_queryset"
         setattr(base_cls, "get_queryset", new_get_queryset)
