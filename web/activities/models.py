@@ -43,7 +43,7 @@ class RecurringActivity(Activity):
     class Meta(Activity.Meta):
         default_related_name = "recurring_activities"
 
-    schedule = models.ForeignKey(Schedule, models.CASCADE)
+    schedule = models.ForeignKey(Schedule, models.CASCADE, related_name="activities")
     duration = models.DurationField()
 
     def __repr__(self):

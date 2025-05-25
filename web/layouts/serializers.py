@@ -5,9 +5,13 @@ from commons.serializers import (
     MainModelSerializer,
     MainWritableNestedModelSerializer,
 )
-from venues.serializers import NestedVenueSerializer
+from commons.serializers.utils import remove_serializer_fields
+from venues.serializers import VenueSerializer
 
 from .models import VisualObject, Seat, SeatZone, Layout
+
+
+NestedVenueSerializer = remove_serializer_fields(VenueSerializer, ["layouts"])
 
 
 class VisualObjectSerializer(MainModelSerializer):
@@ -50,7 +54,7 @@ class PolymorphicVisualObjectSerializer(
     resource_type_field_name = "type"
 
 
-class NestedLayoutSerializer(MainModelSerializer):
+class LayoutSerializer(MainWritableNestedModelSerializer):
     class Meta:
         model = Layout
         fields = (
@@ -59,14 +63,11 @@ class NestedLayoutSerializer(MainModelSerializer):
             "size",
             "created_by",
             "visual_objects",
+            "venue",
         )
         current_user_field = "created_by"
         extra_kwargs = {"size": {"min_value": 180, "max_value": 2560}}
 
-    visual_objects = PolymorphicVisualObjectSerializer(many=True)
-
-
-class LayoutSerializer(MainWritableNestedModelSerializer, NestedLayoutSerializer):
-    class Meta(NestedLayoutSerializer.Meta):
-        fields = NestedLayoutSerializer.Meta.fields + ("venue",)
         fk_serializers = {"venue": {"serializer": NestedVenueSerializer}}
+
+    visual_objects = PolymorphicVisualObjectSerializer(many=True)

@@ -8,6 +8,27 @@ from users.serializers import UserSerializer
 from files.serializers import FileSerializer
 
 
+def remove_serializer_fields(base_cls, remove_fields):
+    original_fields = getattr(base_cls.Meta, "fields", ())
+
+    class Meta:
+        model = base_cls.Meta.model
+        fields = tuple(f for f in original_fields if f not in remove_fields)
+
+    return type(
+        f"Nested{base_cls.__name__}",
+        (base_cls,),
+        {
+            "Meta": Meta,
+            "get_fields": lambda self: {
+                k: v
+                for k, v in super(base_cls, self).get_fields().items()
+                if k not in remove_fields
+            },
+        },
+    )
+
+
 def _add_fields(meta, *fields):
     if hasattr(meta, "fields"):
         fields_type = type(meta.fields)

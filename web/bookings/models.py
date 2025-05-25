@@ -28,7 +28,7 @@ class OneTimeActivityBooking(Booking):
     class Meta(Booking.Meta):
         default_related_name = "one_time_activity_bookings"
 
-    seat = models.ForeignKey(Seat, models.PROTECT)
+    seat = models.ForeignKey(Seat, models.PROTECT, related_name="bookings")
 
     def __repr__(self):
         return f"OneTimeActivityBooking({self.pk})"
@@ -38,7 +38,7 @@ class RecurringActivityBooking(Booking):
     class Meta(Booking.Meta):
         default_related_name = "recurring_activity_bookings"
 
-    option = models.ForeignKey(Option, models.PROTECT)
+    option = models.ForeignKey(Option, models.PROTECT, related_name="bookings")
     week_day = WeekDayField()
     time = models.TimeField()
     note = models.TextField(blank=True, default="")

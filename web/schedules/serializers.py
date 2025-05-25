@@ -30,12 +30,24 @@ class ScheduleSerializer(MainWritableNestedModelSerializer):
             "pk",
             "work_days",
             "booking_duration",
+            "activities",
         )
         read_only_fields = ("pk",)
         current_user_field = "created_by"
         history_deep_copy_fields = ("work_days",)
 
     work_days = WorkDaySerializer(many=True)
+
+    def get_fields(self):
+        from activities.serializers import PolymorphicActivitySerializer
+
+        fields = super().get_fields()
+        if "activities" in fields:
+            fields["activities"] = PolymorphicActivitySerializer(
+                many=True,
+                read_only=True,
+            )
+        return fields
 
     def __init__(self, instance=None, data=serializers.empty, **kwargs):
         # Ensure `work_days.slots` recalculation
