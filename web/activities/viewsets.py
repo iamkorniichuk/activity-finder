@@ -2,12 +2,13 @@ from rest_framework import viewsets, parsers, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db.models import Q
+from django.utils import timezone
 from django_filters import rest_framework as filters
 
 from users.permissions import OwnedByCurrentUserOrReadOnly
 from commons.viewsets import with_my_list_endpoint
 
-from .serializers import PolymorphicActivitySerializer, Activity
+from .serializers import PolymorphicActivitySerializer, Activity, OneTimeActivity
 from .filtersets import ActivityFilterSet
 
 
@@ -53,15 +54,24 @@ class ActivityViewSet(viewsets.ModelViewSet):
         return True
 
     def get_queryset(self):
-        filtering = Q(is_published=True)
+        is_published = Q(is_published=True)
+        today = timezone.now().date()
+        is_relevant = Q(OneTimeActivity___date__gt=today) | ~Q(
+            instance_of=OneTimeActivity
+        )
         current_user = self.request.user
+        is_mine = Q(created_by=current_user)
+
+        all_filters = is_published
+        if self.action != "retrieve":
+            all_filters &= is_relevant
         if not current_user.is_anonymous:
-            filtering = filtering | Q(created_by=current_user)
+            all_filters |= is_mine
 
         return (
             Activity.objects.select_related("venue", "created_by")
             .prefetch_related("media")
-            .filter(filtering)
+            .filter(all_filters)
             .all()
         )
 
