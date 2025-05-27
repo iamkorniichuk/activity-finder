@@ -21,7 +21,6 @@ class ActivitySerializer(MainModelSerializer):
             "name",
             "description",
             "venue",
-            "is_remote",
             "media",
             "is_published",
         )
@@ -31,22 +30,10 @@ class ActivitySerializer(MainModelSerializer):
         fk_serializers = {"venue": {"serializer": NestedVenueSerializer}}
 
     def validate_venue(self, venue):
-        if venue is None:
-            return
-
         if not venue.is_published:
             raise serializers.ValidationError(
                 {"venue_pk": "The object is not published."}
             )
-
-    def validate(self, data):
-        venue = data.get("venue") or self.get_current("venue")
-        is_remote = data.get("is_remote") or self.get_current("is_remote")
-        if not is_remote and not venue:
-            raise serializers.ValidationError(
-                {"venue": "Required when `is_remote` is false."}
-            )
-        return super().validate(data)
 
 
 class OneTimeActivitySerializer(ActivitySerializer):

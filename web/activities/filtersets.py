@@ -1,6 +1,5 @@
 from django.core.validators import EMPTY_VALUES
 from django.contrib.postgres.search import SearchVector
-from django.db.models import Q
 from django_filters import rest_framework as filters
 
 from territories.models import Territory
@@ -29,7 +28,7 @@ def subclasses_as_choices(base_cls):
 class ActivityFilterSet(filters.FilterSet):
     class Meta:
         model = Activity
-        fields = ("name", "is_remote")
+        fields = ("name",)
 
     search = SearchFilter(fields=("name", "description"))
     type = filters.MultipleChoiceFilter(
@@ -51,6 +50,4 @@ class ActivityFilterSet(filters.FilterSet):
         if not territory.exists():
             return queryset
 
-        return queryset.filter(
-            Q(is_remote=False) & Q(venue__location__within=territory.boundaries)
-        )
+        return queryset.filter(venue__location__within=territory.boundaries)

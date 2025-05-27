@@ -16,8 +16,7 @@ class Activity(PolymorphicModel):
     name = models.CharField(max_length=64)
     description = models.TextField()
     created_by = models.ForeignKey(User, models.CASCADE)
-    venue = models.ForeignKey(Venue, models.PROTECT, null=True, blank=True)
-    is_remote = models.BooleanField()
+    venue = models.ForeignKey(Venue, models.PROTECT)
     media = models.ManyToManyField(File)
     is_published = models.BooleanField(default=False, blank=True, editable=False)
 

@@ -8,7 +8,6 @@ def recurring_activity_data(create_schedule):
         "description": "Play VR games with your friends!",
         "type": "RecurringActivity",
         "duration": "01:00:00",
-        "is_remote": True,
         "schedule_pk": create_schedule.json()["pk"],
     }
 
@@ -41,7 +40,6 @@ def one_time_activity_data(publish_venue):
         "date": "2025-06-11",
         "time_range": "12:00:00-19:00:00",
         "venue_pk": publish_venue.json()["pk"],
-        "is_remote": False,
     }
 
 
