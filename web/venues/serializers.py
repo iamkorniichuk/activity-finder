@@ -32,11 +32,9 @@ class VenueSerializer(MainModelSerializer):
         from layouts.serializers import LayoutSerializer
 
         fields = super().get_fields()
-        if "layouts" in fields:
-            fields["layouts"] = LayoutSerializer(many=True, read_only=True)
-        if "activities" in fields:
-            fields["activities"] = PolymorphicActivitySerializer(
-                many=True,
-                read_only=True,
-            )
+        fields["layouts"] = LayoutSerializer(many=True, read_only=True)
+        fields["activities"] = PolymorphicActivitySerializer(
+            many=True,
+            read_only=True,
+        )
         return fields

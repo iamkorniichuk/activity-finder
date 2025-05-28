@@ -40,7 +40,7 @@ class OneTimeActivityBookingSerializer(BookingSerializer):
         return super().validate(data)
 
     def validate_is_seat_related_to_activity(self, seat, activity):
-        if activity.venue != seat.layout.venue:
+        if activity.layout != seat.layout:
             raise serializers.ValidationError(
                 {"seat": "The object is not related to the current activity."}
             )

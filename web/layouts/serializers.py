@@ -28,12 +28,41 @@ class VisualObjectSerializer(MainModelSerializer):
 class SeatSerializer(VisualObjectSerializer):
     class Meta(VisualObjectSerializer.Meta):
         model = Seat
+        fields = VisualObjectSerializer.Meta.fields + ("is_booked",)
+
+    is_booked = serializers.SerializerMethodField()
+
+    def get_is_booked(self, obj):
+        activity = self.context.get("activity")
+        if not activity:
+            return None
+
+        bookings = activity.bookings.filter(OneTimeActivityBooking___seat=obj)
+        return bookings.exists()
 
 
 class SeatZoneSerializer(SeatSerializer):
     class Meta(SeatSerializer.Meta):
         model = SeatZone
-        fields = SeatSerializer.Meta.fields + ("seat_amount",)
+        fields = SeatSerializer.Meta.fields + ("seat_amount", "booked_seats")
+
+    booked_seats = serializers.SerializerMethodField()
+
+    def get_is_booked(self, obj):
+        activity = self.context.get("activity")
+        if not activity:
+            return None
+
+        bookings = activity.bookings.filter(OneTimeActivityBooking___seat=obj)
+        return bookings.count() >= obj.seat_amount
+
+    def get_booked_seats(self, obj):
+        activity = self.context.get("activity")
+        if not activity:
+            return None
+
+        bookings = activity.bookings.filter(OneTimeActivityBooking___seat=obj)
+        return bookings.count()
 
 
 # Inheriting `ModelSerializer` and providing `Meta` make polymorphic serializer writable when nested.
@@ -53,6 +82,11 @@ class PolymorphicVisualObjectSerializer(
     }
     resource_type_field_name = "type"
 
+    def _get_serializer_from_model_or_instance(self, model_or_instance):
+        serializer = super()._get_serializer_from_model_or_instance(model_or_instance)
+        serializer.context["activity"] = self.context.get("activity")
+        return serializer
+
 
 class LayoutSerializer(MainWritableNestedModelSerializer):
     class Meta:
@@ -71,3 +105,7 @@ class LayoutSerializer(MainWritableNestedModelSerializer):
         fk_serializers = {"venue": {"serializer": NestedVenueSerializer}}
 
     visual_objects = PolymorphicVisualObjectSerializer(many=True)
+
+    def to_representation(self, instance):
+        self.fields["visual_objects"].context["activity"] = self.context.get("activity")
+        return super().to_representation(instance)

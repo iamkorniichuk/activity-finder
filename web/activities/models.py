@@ -3,6 +3,7 @@ from polymorphic.models import PolymorphicModel
 
 from users.models import User
 from venues.models import Venue
+from layouts.models import Layout
 from commons.models import TimeRangeField
 from schedules.models import Schedule
 from files.models import File
@@ -32,6 +33,7 @@ class OneTimeActivity(Activity):
         default_related_name = "one_time_activities"
 
     time_range = TimeRangeField()
+    layout = models.ForeignKey(Layout, models.PROTECT)
     date = models.DateField()
 
     def __repr__(self):

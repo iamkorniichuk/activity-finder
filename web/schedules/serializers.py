@@ -14,6 +14,25 @@ class WorkDaySerializer(MainWritableNestedModelSerializer):
         choice_fields = ("week_day",)
         read_only_fields = ("slots",)
 
+    slots = serializers.SerializerMethodField()
+
+    def get_slots(self, instance):
+        activity = self.context.get("activity")
+        if not activity:
+            return [{"time": slot, "is_booked": None} for slot in instance.slots]
+
+        booked_times = {}
+        same_day_bookings = activity.bookings.filter(
+            activity=activity,
+            RecurringActivityBooking___week_day=instance.week_day,
+        ).all()
+        for obj in same_day_bookings:
+            booked_times.append(obj.time)
+
+        return [
+            {"time": slot, "is_booked": slot in booked_times} for slot in instance.slots
+        ]
+
     def validate(self, data):
         booking_duration = self.context.get("booking_duration")
         if booking_duration is not None:
@@ -34,20 +53,8 @@ class ScheduleSerializer(MainWritableNestedModelSerializer):
         )
         read_only_fields = ("pk",)
         current_user_field = "created_by"
-        history_deep_copy_fields = ("work_days",)
 
     work_days = WorkDaySerializer(many=True)
-
-    def get_fields(self):
-        from activities.serializers import PolymorphicActivitySerializer
-
-        fields = super().get_fields()
-        if "activities" in fields:
-            fields["activities"] = PolymorphicActivitySerializer(
-                many=True,
-                read_only=True,
-            )
-        return fields
 
     def __init__(self, instance=None, data=serializers.empty, **kwargs):
         # Ensure `work_days.slots` recalculation
@@ -56,6 +63,20 @@ class ScheduleSerializer(MainWritableNestedModelSerializer):
             value = self.fields["work_days"].get_attribute(instance)
             data["work_days"] = self.fields["work_days"].to_representation(value)
         super().__init__(instance, data, **kwargs)
+
+    def to_representation(self, instance):
+        self.fields["work_days"].context["activity"] = self.context.get("activity")
+        return super().to_representation(instance)
+
+    def get_fields(self):
+        from activities.serializers import PolymorphicActivitySerializer
+
+        fields = super().get_fields()
+        fields["activities"] = PolymorphicActivitySerializer(
+            many=True,
+            read_only=True,
+        )
+        return fields
 
     def validate_work_days(self, data):
         unique_days = set([obj["week_day"] for obj in data])

@@ -7,6 +7,7 @@ from users.validators import OwnedByCurrentUser
 from schedules.serializers import ScheduleSerializer
 from activities.models import Activity, OneTimeActivity, RecurringActivity
 from venues.serializers import VenueSerializer
+from layouts.serializers import LayoutSerializer
 
 
 NestedScheduleSerializer = remove_serializer_fields(ScheduleSerializer, ["activities"])
@@ -42,7 +43,24 @@ class OneTimeActivitySerializer(ActivitySerializer):
         fields = ActivitySerializer.Meta.fields + (
             "time_range",
             "date",
+            "layout",
         )
+        fk_serializers = ActivitySerializer.Meta.fk_serializers | {
+            "layout": {"serializer": LayoutSerializer}
+        }
+
+    def validate(self, data):
+        venue = data.get("venue") or self.get_current("venue")
+        layout = data.get("layout") or self.get_current("layout")
+        if venue != layout.venue:
+            raise serializers.ValidationError(
+                {"layout": "The object is not related to the current venue."}
+            )
+        return super().validate(data)
+
+    def to_representation(self, instance):
+        self.fields["layout"].context["activity"] = instance
+        return super().to_representation(instance)
 
 
 class RecurringActivitySerializer(ActivitySerializer):
@@ -60,6 +78,10 @@ class RecurringActivitySerializer(ActivitySerializer):
             }
         }
 
+    def to_representation(self, instance):
+        self.fields["schedule"].context["activity"] = instance
+        return super().to_representation(instance)
+
     def get_fields(self):
         from options.serializers import OptionSerializer
 
@@ -68,7 +90,6 @@ class RecurringActivitySerializer(ActivitySerializer):
             OptionSerializer, ["activity"]
         )
         fields["options"] = NestedOptionSerializer(many=True, read_only=True)
-        fields["schedule"].context["activity"] = self.instance
         return fields
 
 
