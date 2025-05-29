@@ -45,7 +45,7 @@ class ActivityFilterSet(filters.FilterSet):
         selected = [cls for name, cls in valid_choices if name in value]
         return queryset.instance_of(*selected)
 
-    def filter_by_within_territory(self, queryset, key, value):
+    def filter_by_within_territory(self, queryset, key, value: Territory):
         territory = Territory.objects.filter(pk=value)
         if not territory.exists():
             return queryset

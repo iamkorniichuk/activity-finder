@@ -1,10 +1,22 @@
 from copy import copy
+from typing import Optional
 from rest_framework import serializers
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 
 from commons.serializers import MainWritableNestedModelSerializer
 from commons.time import TimeWrapper
 
 from .models import Schedule, WorkDay, generate_slots
+
+
+class SlotSerializer(serializers.Serializer):
+    time = serializers.TimeField()
+    is_booked = serializers.SerializerMethodField()
+
+    @extend_schema_field(Optional[OpenApiTypes.BOOL])
+    def get_is_booked(self, obj):
+        pass
 
 
 class WorkDaySerializer(MainWritableNestedModelSerializer):
@@ -16,6 +28,7 @@ class WorkDaySerializer(MainWritableNestedModelSerializer):
 
     slots = serializers.SerializerMethodField()
 
+    @extend_schema_field(SlotSerializer)
     def get_slots(self, instance):
         activity = self.context.get("activity")
         if not activity:

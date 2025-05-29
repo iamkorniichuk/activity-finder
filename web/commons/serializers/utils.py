@@ -1,4 +1,5 @@
 from copy import copy
+from uuid import uuid4
 from rest_framework import serializers
 from rest_framework.utils.field_mapping import get_relation_kwargs
 from drf_spectacular.utils import extend_schema_field
@@ -16,7 +17,7 @@ def remove_serializer_fields(base_cls, remove_fields):
         fields = tuple(f for f in original_fields if f not in remove_fields)
 
     return type(
-        f"Nested{base_cls.__name__}",
+        f"Nested{base_cls.__name__}{uuid4().hex}",
         (base_cls,),
         {
             "Meta": Meta,

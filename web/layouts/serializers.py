@@ -1,4 +1,7 @@
 from rest_framework import serializers
+from typing import Optional
+from drf_spectacular.utils import extend_schema_field
+from drf_spectacular.types import OpenApiTypes
 
 from commons.serializers import (
     MainPolymorphicSerializer,
@@ -32,6 +35,7 @@ class SeatSerializer(VisualObjectSerializer):
 
     is_booked = serializers.SerializerMethodField()
 
+    @extend_schema_field(Optional[OpenApiTypes.BOOL])
     def get_is_booked(self, obj):
         activity = self.context.get("activity")
         if not activity:
@@ -48,6 +52,7 @@ class SeatZoneSerializer(SeatSerializer):
 
     booked_seats = serializers.SerializerMethodField()
 
+    @extend_schema_field(Optional[OpenApiTypes.BOOL])
     def get_is_booked(self, obj):
         activity = self.context.get("activity")
         if not activity:
@@ -56,6 +61,7 @@ class SeatZoneSerializer(SeatSerializer):
         bookings = activity.bookings.filter(OneTimeActivityBooking___seat=obj)
         return bookings.count() >= obj.seat_amount
 
+    @extend_schema_field(Optional[OpenApiTypes.INT])
     def get_booked_seats(self, obj):
         activity = self.context.get("activity")
         if not activity:
