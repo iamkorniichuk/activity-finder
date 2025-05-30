@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "options",
     "reactions",
     "schedules",
+    "stats",
     "territories",
     "users",
     "venues",

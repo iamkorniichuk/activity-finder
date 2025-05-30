@@ -24,6 +24,7 @@ urlpatterns = [
     path("options/", include("options.urls"), name="options"),
     path("reactions/", include("reactions.urls"), name="reactions"),
     path("schedules/", include("schedules.urls"), name="schedules"),
+    path("stats/", include("stats.urls"), name="stats"),
     path("territories/", include("territories.urls"), name="territories"),
     path("users/", include("users.urls"), name="users"),
     path("venues/", include("venues.urls"), name="venues"),
