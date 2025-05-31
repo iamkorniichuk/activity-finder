@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
 
 
-class StatSerializer(serializers.Serializer):
+class RequestStatSerializer(serializers.Serializer):
     INTERVAL_CHOICES = [
         ("day", "day"),
         ("week", "week"),
@@ -28,3 +28,12 @@ class StatSerializer(serializers.Serializer):
             "week": TruncWeek,
             "month": TruncMonth,
         }[interval]
+
+
+class ResponseStatSerializer(serializers.Serializer):
+    period = serializers.DateField()
+    total_bookings = serializers.IntegerField()
+    recurring_activity_bookings = serializers.IntegerField()
+    one_time_activity_bookings = serializers.IntegerField()
+    total_customers = serializers.IntegerField()
+    repeat_customers = serializers.IntegerField()

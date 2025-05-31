@@ -1,18 +1,22 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
-from django.db.models import Count, Q, OuterRef, Subquery
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Count, Q, OuterRef, Subquery, DateField
+from django.db.models.functions import Cast
 from django.contrib.contenttypes.models import ContentType
+from drf_spectacular.utils import extend_schema
 
 from bookings.models import Booking, RecurringActivityBooking, OneTimeActivityBooking
 
-from .serializers import StatSerializer
+from .serializers import RequestStatSerializer, ResponseStatSerializer
 
 
+@extend_schema(parameters=[RequestStatSerializer], responses=ResponseStatSerializer)
 class StatView(ListAPIView):
-    serializer_class = StatSerializer
+    permission_classes = (IsAuthenticated,)
 
     def list(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.query_params)
+        serializer = RequestStatSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
 
         current_user = request.user
@@ -21,8 +25,9 @@ class StatView(ListAPIView):
         trunc_func = serializer.get_trunc_function()
 
         stats = self.get_stats(current_user, start, end, trunc_func)
+        serializer = ResponseStatSerializer(stats, many=True)
 
-        return Response(stats)
+        return Response(serializer.data)
 
     def get_stats(self, user, start, end, trunc_func):
         recurring_type = ContentType.objects.get_for_model(RecurringActivityBooking).id
@@ -30,7 +35,7 @@ class StatView(ListAPIView):
 
         bookings = Booking.objects.filter(
             activity__created_by=user, booked_at__range=(start, end)
-        ).annotate(period=trunc_func("booked_at"))
+        ).annotate(period=Cast(trunc_func("booked_at"), output_field=DateField()))
 
         customers = bookings.values("period", "booked_by").annotate(count=Count("id"))
 
