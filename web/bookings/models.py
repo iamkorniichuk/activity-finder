@@ -2,7 +2,6 @@ from django.db import models
 from polymorphic.models import PolymorphicModel
 
 from users.models import User
-from commons.models import WeekDayField
 from options.models import Option
 from layouts.models import Seat
 from activities.models import Activity
@@ -39,7 +38,7 @@ class RecurringActivityBooking(Booking):
         default_related_name = "recurring_activity_bookings"
 
     option = models.ForeignKey(Option, models.PROTECT, related_name="bookings")
-    week_day = WeekDayField()
+    date = models.DateField()
     time = models.TimeField()
     note = models.TextField(blank=True, default="")
 

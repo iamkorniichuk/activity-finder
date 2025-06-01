@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils.timezone import now
 
 from commons.serializers import MainModelSerializer, MainPolymorphicSerializer
 from options.serializers import OptionSerializer
@@ -62,10 +63,10 @@ class RecurringActivityBookingSerializer(BookingSerializer):
     class Meta(BookingSerializer.Meta):
         model = RecurringActivityBooking
         fields = BookingSerializer.Meta.fields + (
-            "week_day",
             "time",
             "booked_by",
             "booked_at",
+            "date",
             "option",
             "note",
         )
@@ -76,17 +77,23 @@ class RecurringActivityBookingSerializer(BookingSerializer):
             "option": {"serializer": OptionSerializer},
         }
 
+    def validate_date(self, value):
+        if value <= now().date():
+            raise serializers.ValidationError("You can't book for past slots.")
+        return value
+
     def validate(self, data):
         activity = data.get("activity") or self.get_current("activity")
         option = data.get("option") or self.get_current("option")
         self.validate_is_option_related_to_activity(option, activity)
 
-        week_day = data.get("week_day") or self.get_current("week_day")
+        date = data.get("date") or self.get_current("date")
+        week_day = date.weekday()
         time = data.get("time") or self.get_current("time")
         schedule = activity.schedule
 
         self.validate_is_within_schedule(schedule, week_day, time)
-        self.validate_is_booking_free(activity, week_day, time)
+        self.validate_is_booking_free(activity, date, time)
 
         return super().validate(data)
 
@@ -109,13 +116,13 @@ class RecurringActivityBookingSerializer(BookingSerializer):
                 )
 
         raise serializers.ValidationError(
-            {"week_day": "Selected time doesn't suit the schedule"}
+            {"date": "Selected time doesn't suit the schedule"}
         )
 
-    def validate_is_booking_free(self, activity, week_day, time):
+    def validate_is_booking_free(self, activity, date, time):
         same_booking = RecurringActivityBooking.objects.filter(
             activity=activity,
-            week_day=week_day,
+            date=date,
             time=time,
         )
         if same_booking.exists():

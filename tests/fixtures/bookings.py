@@ -5,7 +5,7 @@ import pytest
 def booking_data(create_option):
     yield {
         "option_pk": create_option.json()["pk"],
-        "week_day": 1,
+        "date": "2027-12-07",
         "time": "09:00:00",
     }
 

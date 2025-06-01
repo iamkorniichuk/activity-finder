@@ -1,6 +1,7 @@
 from copy import copy
 from typing import Optional
 from rest_framework import serializers
+from django.utils.timezone import timedelta, now
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
 
@@ -22,11 +23,12 @@ class SlotSerializer(serializers.Serializer):
 class WorkDaySerializer(MainWritableNestedModelSerializer):
     class Meta:
         model = WorkDay
-        fields = ("week_day", "work_hours", "break_hours", "slots")
+        fields = ("week_day", "work_hours", "break_hours", "slots", "date")
         choice_fields = ("week_day",)
         read_only_fields = ("slots",)
 
     slots = serializers.SerializerMethodField()
+    date = serializers.SerializerMethodField()
 
     @extend_schema_field(SlotSerializer)
     def get_slots(self, instance):
@@ -36,8 +38,7 @@ class WorkDaySerializer(MainWritableNestedModelSerializer):
 
         booked_times = {}
         same_day_bookings = activity.bookings.filter(
-            activity=activity,
-            RecurringActivityBooking___week_day=instance.week_day,
+            RecurringActivityBooking___date=self.get_date(instance),
         ).all()
         for obj in same_day_bookings:
             booked_times.append(obj.time)
@@ -45,6 +46,17 @@ class WorkDaySerializer(MainWritableNestedModelSerializer):
         return [
             {"time": slot, "is_booked": slot in booked_times} for slot in instance.slots
         ]
+
+    @extend_schema_field(Optional[OpenApiTypes.DATE])
+    def get_date(self, instance):
+        activity = self.context.get("activity")
+        if not activity:
+            return None
+
+        today = now()
+        monday = today - timedelta(days=today.weekday())
+        datetime = monday + timedelta(days=instance.week_day)
+        return datetime.date()
 
     def validate(self, data):
         booking_duration = self.context.get("booking_duration")
