@@ -12,6 +12,7 @@ drf-writable-nested==0.7.2
 environs==11.0.0
 geopy==2.4.1
 gunicorn==23.0.0
+hiredis==3.2.1
 Pillow==11.1.0
 pgvector==0.4.0
 psycopg[binary,pool]==3.2.1
@@ -19,4 +20,5 @@ python-magic==0.4.15 ; platform_system == "Windows"
 python-magic-bin==0.4.14 ; platform_system == "Windows"
 python-magic==0.4.27 ; platform_system == "Linux"
 python-magic-bin @ git+https://github.com/julian-r/python-magic.git@6029e2d43ce0ee9f268c1f112c70e5417493190f ; platform_system == "Linux"
+redis==6.2.0
 setuptools==78.1.0
