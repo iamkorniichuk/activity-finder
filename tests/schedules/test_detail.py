@@ -21,7 +21,9 @@ class TestDetailSchedules:
             "17:30:00",
             "18:30:00",
         ]
-        assert data["work_days"][0]["slots"] == correct_slots
+        data_slots = data["work_days"][0]["slots"]
+        for i in range(len(correct_slots)):
+            assert data_slots[i]["time"] == correct_slots[i]
 
     def test_successful_duration_patch(self, auth_client, create_schedule):
         url = self.build_url(create_schedule.json()["pk"])
@@ -52,7 +54,9 @@ class TestDetailSchedules:
             "18:30:00",
             "19:00:00",
         ]
-        assert data["work_days"][0]["slots"] == correct_slots
+        data_slots = data["work_days"][0]["slots"]
+        for i in range(len(correct_slots)):
+            assert data_slots[i]["time"] == correct_slots[i]
 
     def test_successful_work_days_patch(self, auth_client, create_schedule):
         url = self.build_url(create_schedule.json()["pk"])
@@ -83,7 +87,9 @@ class TestDetailSchedules:
             "16:00:00",
             "17:00:00",
         ]
-        assert data["work_days"][0]["slots"] == correct_slots
+        data_slots = data["work_days"][0]["slots"]
+        for i in range(len(correct_slots)):
+            assert data_slots[i]["time"] == correct_slots[i]
 
     def test_indivisible_interval(self, auth_client, create_schedule):
         url = self.build_url(create_schedule.json()["pk"])

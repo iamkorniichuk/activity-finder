@@ -85,8 +85,10 @@ class ScheduleSerializer(MainWritableNestedModelSerializer):
         # Ensure `work_days.slots` recalculation
         is_update_action = instance is not None and data is not serializers.empty
         if is_update_action and "work_days" not in data:
-            value = self.fields["work_days"].get_attribute(instance)
-            data["work_days"] = self.fields["work_days"].to_representation(value)
+            self.parent = None  # Avoid `AttributeError`
+            field = self.fields["work_days"]
+            work_days = field.get_attribute(instance)
+            data["work_days"] = field.to_representation(work_days)
         super().__init__(instance, data, **kwargs)
 
     def to_representation(self, instance):
