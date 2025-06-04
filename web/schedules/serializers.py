@@ -1,7 +1,8 @@
 from copy import copy
 from typing import Optional
 from rest_framework import serializers
-from django.utils.timezone import timedelta, now
+from django.utils.timezone import timedelta, now, datetime
+from django.db.models import ExpressionWrapper, F, DateTimeField
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
 
@@ -36,16 +37,47 @@ class WorkDaySerializer(MainWritableNestedModelSerializer):
         if not activity:
             return [{"time": slot, "is_booked": None} for slot in instance.slots]
 
-        booked_times = {}
-        same_day_bookings = activity.bookings.filter(
-            RecurringActivityBooking___date=self.get_date(instance),
-        ).all()
-        for obj in same_day_bookings:
-            booked_times.append(obj.time)
+        from bookings.models import RecurringActivityBooking
 
-        return [
-            {"time": slot, "is_booked": slot in booked_times} for slot in instance.slots
-        ]
+        booking_duration = activity.schedule.booking_duration
+        date = self.get_date(instance)
+
+        slot_intervals = {
+            slot: (
+                datetime.combine(date, slot),
+                datetime.combine(date, slot) + booking_duration,
+            )
+            for slot in instance.slots
+        }
+
+        same_day_bookings = (
+            RecurringActivityBooking.objects.filter(
+                activity=activity,
+                date=date,
+            )
+            .annotate(
+                start=ExpressionWrapper(
+                    F("date") + F("time"), output_field=DateTimeField()
+                )
+            )
+            .annotate(
+                end=ExpressionWrapper(
+                    F("start") + booking_duration, output_field=DateTimeField()
+                ),
+            )
+        ).all()
+
+        booked_intervals = [(b.start, b.end) for b in same_day_bookings]
+
+        results = []
+        for slot, (slot_start, slot_end) in slot_intervals.items():
+            is_booked = any(
+                booking_start < slot_end and booking_end > slot_start
+                for booking_start, booking_end in booked_intervals
+            )
+            results.append({"time": slot, "is_booked": is_booked})
+
+        return results
 
     @extend_schema_field(Optional[OpenApiTypes.DATE])
     def get_date(self, instance):
