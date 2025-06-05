@@ -35,6 +35,9 @@ class PointField(serializers.Field):
         if data is None:
             return None
 
+        if not isinstance(data, str):
+            raise serializers.ValidationError("Invalid type provided.")
+
         data = [float(value) for value in data.split(",")]
         if len(data) != self.dimension:
             self.fail("dimension", dimension=self.dimension)
@@ -59,6 +62,8 @@ class PairField(serializers.ListField):
     def to_internal_value(self, data: str):
         if isinstance(data, list):
             data = data[0]
+        if not isinstance(data, str):
+            raise serializers.ValidationError("Invalid type provided.")
         data = [obj.strip() for obj in data.split(self.separator)]
         return super().to_internal_value(data)
 
