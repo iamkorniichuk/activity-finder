@@ -1,4 +1,5 @@
 from django.contrib.gis.db import models
+from django.contrib.postgres.fields import ArrayField
 
 from users.models import User
 from files.models import File
@@ -20,6 +21,7 @@ class Venue(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     media = models.ManyToManyField(File, related_name="media_venues")
     is_published = models.BooleanField(default=False, blank=True, editable=False)
+    website_links = ArrayField(models.URLField(), size=10, blank=True, default=list)
 
     def __str__(self):
         return self.name

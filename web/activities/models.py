@@ -1,4 +1,5 @@
 from django.contrib.gis.db import models
+from django.contrib.postgres.fields import ArrayField
 from polymorphic.models import PolymorphicModel
 
 from users.models import User
@@ -20,6 +21,7 @@ class Activity(PolymorphicModel):
     venue = models.ForeignKey(Venue, models.PROTECT)
     media = models.ManyToManyField(File)
     is_published = models.BooleanField(default=False, blank=True, editable=False)
+    website_links = ArrayField(models.URLField(), size=10, blank=True, default=list)
 
     def __str__(self):
         return self.name

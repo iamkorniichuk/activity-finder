@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from commons.serializers import MainModelSerializer, MainPolymorphicSerializer
+from commons.serializers.fields import WebsiteLinksField
 from commons.serializers.utils import remove_serializer_fields
 from files.validators import media_content_type_validator
 from users.validators import OwnedByCurrentUser
@@ -24,11 +25,14 @@ class ActivitySerializer(MainModelSerializer):
             "venue",
             "media",
             "is_published",
+            "website_links",
         )
         read_only_fields = ("pk", "is_published")
         current_user_field = "created_by"
         multiple_file_fields = {"media": {"validators": [media_content_type_validator]}}
         fk_serializers = {"venue": {"serializer": NestedVenueSerializer}}
+
+    website_links = WebsiteLinksField(allow_empty=True, required=False)
 
     def validate_venue(self, venue):
         if not venue.is_published:

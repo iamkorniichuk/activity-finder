@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.postgres.fields import ArrayField
 
 
 class UserManager(BaseUserManager):
@@ -24,6 +25,7 @@ class User(AbstractBaseUser):
     display_name = models.CharField(max_length=48, null=True, blank=True)
     description = models.CharField(max_length=256, null=True, blank=True)
     birth_date = models.DateField(blank=True, null=True)
+    website_links = ArrayField(models.URLField(), size=10, blank=True, default=list)
     last_login = None
 
     USERNAME_FIELD = "username"

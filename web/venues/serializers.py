@@ -1,4 +1,5 @@
 from commons.serializers import MainModelSerializer
+from commons.serializers.fields import WebsiteLinksField
 from files.validators import media_content_type_validator
 
 from .models import Venue
@@ -19,6 +20,7 @@ class VenueSerializer(MainModelSerializer):
             "layouts",
             "activities",
             "is_published",
+            "website_links",
         )
         read_only_fields = ("pk", "created_at", "is_published")
         current_user_field = "created_by"
@@ -26,6 +28,8 @@ class VenueSerializer(MainModelSerializer):
             "media": {"validators": [media_content_type_validator]},
             "route": {"validators": [media_content_type_validator]},
         }
+
+    website_links = WebsiteLinksField(allow_empty=True, required=False)
 
     def get_fields(self):
         from activities.serializers import PolymorphicActivitySerializer
